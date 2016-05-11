@@ -1,0 +1,23 @@
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Site Manager.exe.config
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Site Manager.exe
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Site Manager.pdb
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Internet Protocol.dll
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Internet Protocol.pdb
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\App-Site Manager.csprojResolveAssemblyReference.cache
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site_Manager.mdiMain.resources
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site_Manager.Properties.Resources.resources
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site_Manager.sdiSite.resources
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\App-Site Manager.csproj.GenerateResource.Cache
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site Manager.exe
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site Manager.pdb
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Cisco Device.dll
+c:\users\rpace\documents\visual studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Cisco Device.pdb
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site_Manager.sdiASRSelect.resources
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site_Manager.sdiSiteMaps.resources
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site_Manager.sdiSiteCircuits.resources
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site_Manager.sdiSiteSchedule.resources
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\App-Site Manager.csproj.ResolveComReference.cache
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Site Manager.exe.manifest
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\bin\Debug\Site Manager.application
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site Manager.exe.manifest
+C:\Users\rpace\Documents\Visual Studio 2015\Projects\CTL Site Manager\Site Manager\obj\Debug\Site Manager.application
