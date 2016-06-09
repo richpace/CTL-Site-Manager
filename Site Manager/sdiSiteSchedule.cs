@@ -87,11 +87,11 @@ namespace Site_Manager
             TreeNode nodeInt = new TreeNode(inInt.Customer + "; " + inInt.CircuitID + "; " + inDev.Hostname.ToUpper());
             nodeInt.Tag = inInt;
 
-            TreeNode nodeDate = getDateNode(inInt.MigrationDate.ToShortDateString(), inDev.Units[inInt.Unit].Type);
+            TreeNode nodeDate = getDateNode(inInt.MigrationDate.ToShortDateString(), inDev.Units[inInt.Unit].Type2);
             nodeDate.Nodes.Add(nodeInt);
         }
 
-        private TreeNode getDateNode(string inDate, string inType)
+        private TreeNode getDateNode(string inDate, UnitType inType)
         {
             string typeCX = getCircuitType(inType);
             TreeNode nodeDate;
@@ -129,13 +129,13 @@ namespace Site_Manager
             return nodeType;
         }
 
-        private string getCircuitType(string inUnitType)
+        private string getCircuitType(UnitType inUnitType)
         {
             switch (inUnitType)
             {
-                case "STS-CH":
+                case UnitType.CH:
                     return "DCS";
-                case "STS-CL":
+                case UnitType.CL:
                     return "MON";
                 default:
                     return "PHY";

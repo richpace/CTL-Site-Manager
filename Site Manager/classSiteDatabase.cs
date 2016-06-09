@@ -256,10 +256,23 @@ namespace Site_Manager
         {
             string devType = inLine[1];
             string devFN = inLine[2];
+            classIOX devIOX;
+            classIOS devIOS;
+
             switch (devType)
             {
                 case "IOX":
-                    classIOX devIOX = new classIOX(devFN);
+                    try
+                    {
+                        devIOX = new classIOX(devFN);
+                    }
+                    catch
+                    {
+                        string devName = devFN.Split("\\".ToCharArray()).Last();
+                        devFN = getFNameOpen(devName);
+                        devIOX = new classIOX(devFN);
+                    }
+
                     if (inLine[3].ToLower() == "true")
                     {
                         devIOX.Assigned = true;
@@ -267,7 +280,17 @@ namespace Site_Manager
                     siteIOXDevices.Add(devIOX);
                     break;
                 case "IOS":
-                    classIOS devIOS = new classIOS(devFN);
+                    try
+                    {
+                        devIOS = new classIOS(devFN);
+                    }
+                    catch
+                    {
+                        string devName = devFN.Split("\\".ToCharArray()).Last();
+                        devFN = getFNameOpen(devName);
+                        devIOS = new classIOS(devFN);
+                    }
+
                     if (inLine[3] != "")
                     {
                         devIOS.AssignASR(inLine[3]);
@@ -275,6 +298,26 @@ namespace Site_Manager
                     siteIOSDevices.Add(devIOS);
                     break;
             }
+
+            //switch (devType)
+            //{
+            //    case "IOX":
+            //        classIOX devIOX = new classIOX(devFN);
+            //        if (inLine[3].ToLower() == "true")
+            //        {
+            //            devIOX.Assigned = true;
+            //        }
+            //        siteIOXDevices.Add(devIOX);
+            //        break;
+            //    case "IOS":
+            //        classIOS devIOS = new classIOS(devFN);
+            //        if (inLine[3] != "")
+            //        {
+            //            devIOS.AssignASR(inLine[3]);
+            //        }
+            //        siteIOSDevices.Add(devIOS);
+            //        break;
+            //}
         }
 
         private void readDevice(string inLine)
@@ -430,9 +473,11 @@ namespace Site_Manager
 
         private void readSchedule(string[] inLine)
         {
+            classIOSInterface intLegacy;
+
             classIOS devLegacy = Legacy[inLine[1]];
-            classIOSInterface intLegacy = devLegacy.Circuits[inLine[2]];
-            intLegacy.MigrationDate = DateTime.Parse(inLine[3]);
+            intLegacy = devLegacy.Circuits[inLine[2]];
+            if (intLegacy != null) intLegacy.MigrationDate = DateTime.Parse(inLine[3]);
         }
 
         private string getFNameSave()
@@ -443,6 +488,22 @@ namespace Site_Manager
             dlg.DefaultExt = "sdb";
             dlg.OverwritePrompt = true;
             dlg.Filter = "Site Database Files (*.sdb)|*.sdb|All files(*.*)|*.*";
+            dlg.ShowDialog();
+
+            if (dlg.FileName == "")
+            {
+                return null;
+            }
+            else
+            {
+                return dlg.FileName;
+            }
+        }
+
+        private string getFNameOpen(string inDeviceName)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Title = "Unable to find " + inDeviceName;
             dlg.ShowDialog();
 
             if (dlg.FileName == "")
@@ -499,7 +560,7 @@ namespace Site_Manager
                     unitID = legacyDevice.Units[u];
                     if (unitID.Active == true && unitID.Width == 12)
                     {
-                        if (unitID.Assigned == false)
+                        if (unitID.Assigned == false && unitID.Assignable == true)
                         {
                             mapUnit(legacyDevice.Hostname, unitID, legacyDevice.PreferredASR);
                         }
@@ -510,7 +571,7 @@ namespace Site_Manager
                     unitID = legacyDevice.Units[u];
                     if (unitID.Active == true && unitID.Width == 3)
                     {
-                        if (unitID.Assigned == false)
+                        if (unitID.Assigned == false && unitID.Assignable == true)
                         {
                             mapUnit(legacyDevice.Hostname, unitID, legacyDevice.PreferredASR);
                         }
@@ -532,7 +593,7 @@ namespace Site_Manager
                     unitID = legacyDevice.Units[u];
                     if (unitID.Active == true && unitID.Width == 12)
                     {
-                        if (unitID.Assigned == false)
+                        if (unitID.Assigned == false && unitID.Assignable == true)
                         {
                             mapUnit(legacyDevice.Hostname, unitID);
                         }
@@ -543,7 +604,7 @@ namespace Site_Manager
                     unitID = legacyDevice.Units[u];
                     if (unitID.Active == true && unitID.Width == 3)
                     {
-                        if (unitID.Assigned == false)
+                        if (unitID.Assigned == false && unitID.Assignable == true)
                         {
                             mapUnit(legacyDevice.Hostname, unitID);
                         }
@@ -565,7 +626,7 @@ namespace Site_Manager
                     unitID = legacyDevice.Units[u];
                     if (unitID.Active == true)
                     {
-                        if (unitID.Assigned == false)
+                        if (unitID.Assigned == false && unitID.Assignable == true)
                         {
                             mapUnit(legacyDevice.Hostname, unitID, legacyDevice.PreferredASR);
                         }
@@ -587,7 +648,7 @@ namespace Site_Manager
                     unitID = legacyDevice.Units[u];
                     if (unitID.Active == true)
                     {
-                        if (unitID.Assigned == false)
+                        if (unitID.Assigned == false && unitID.Assignable == true)
                         {
                             mapUnit(legacyDevice.Hostname, unitID);
                         }

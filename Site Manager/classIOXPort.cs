@@ -40,21 +40,24 @@ namespace Site_Manager
                     portUnits = new classIOXUnit[1];
                     for (int i = 0; i < 1; i++)
                     {
-                        portUnits[i] = new classIOXUnit(i, "GE");
+                        //portUnits[i] = new classIOXUnit(i, "GE");
+                        portUnits[i] = new classIOXUnit(i, UnitType.GE);
                     }
                     break;
                 case "CHOC12":
                     portUnits = new classIOXUnit[12];
                     for (int i = 0; i < 12; i++)
                     {
-                        portUnits[i] = new classIOXUnit(i, "STS-CH");
+                        //portUnits[i] = new classIOXUnit(i, "STS-CH");
+                        portUnits[i] = new classIOXUnit(i, UnitType.CH);
                     }
                     break;
                 case "CHOC48":
                     portUnits = new classIOXUnit[48];
                     for (int i = 0; i < 48; i++)
                     {
-                        portUnits[i] = new classIOXUnit(i, "STS-CL");
+                        //portUnits[i] = new classIOXUnit(i, "STS-CL");
+                        portUnits[i] = new classIOXUnit(i, UnitType.CL);
                     }
                     break;
             }

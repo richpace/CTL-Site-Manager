@@ -237,7 +237,7 @@ namespace Site_Manager
                         switch (strArray[1])
                         {
                             case "address":
-                                intIPv4 = new clsIPAddress(strArray[2], strArray[3]);
+                                intIPv4 = new classIPAddress(strArray[2], strArray[3]);
                                 break;
                             case "igmp":
                                 intIGMPVersion = strArray[3];

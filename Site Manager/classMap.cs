@@ -10,6 +10,7 @@ namespace Site_Manager
     {
         // FIELDS //
         private string mapType = null;
+        private UnitType mapType2;
         private string mapASRID = null;
         private string mapASRPrefix = null;
         private string mapLegacyID = null;
@@ -18,7 +19,7 @@ namespace Site_Manager
         // CONSTRUCTORS //
         public classMap(string inLegacyID, classUnit inLegacyUnit, string inASRID, classUnit inASRUnit)
         {
-            mapType = inLegacyUnit.Type;
+            mapType2 = inLegacyUnit.Type2;
             mapASRID = inASRID;
             mapASRPrefix = inASRUnit.Prefix;
             mapLegacyID = inLegacyID;
@@ -29,6 +30,10 @@ namespace Site_Manager
         }
 
         // PROPERTIES //
+        public UnitType Type2
+        {
+            get { return mapType2; }
+        }
         public string Type
         {
             get

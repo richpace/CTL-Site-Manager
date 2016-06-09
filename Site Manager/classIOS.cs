@@ -133,17 +133,20 @@ namespace Site_Manager
                                         case "POS":
                                             if (intNew.CircuitID.Contains("OC3") == true)
                                             {
-                                                Units.Add("STS-CL", intNew.Unit, 3);
+                                                //Units.Add("STS-CL", intNew.Unit, 3);
+                                                Units.Add(UnitType.CL, intNew.Unit, 3);
                                             }
                                             if (intNew.CircuitID.Contains("OC12") == true)
                                             {
-                                                Units.Add("STS-CL", intNew.Unit, 12);
+                                                Units.Add(UnitType.CL, intNew.Unit, 12);
+                                                //Units.Add("STS-CL", intNew.Unit, 12);
                                             }
                                             break;
                                         case "GIGABITETHERNET":
 
                                             {
-                                                Units.Add("GE", intNew.Unit);
+                                                //Units.Add("GE", intNew.Unit);
+                                                Units.Add(UnitType.GE, intNew.Unit);
                                                 //Units.AddUnitGE(intNew.ControllerID);
                                                 Units[intNew.Unit].ActivateUnit();
                                             }

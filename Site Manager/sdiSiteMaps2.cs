@@ -12,17 +12,17 @@ using Microsoft.Office.Interop.Excel;
 
 namespace Site_Manager
 {
-    public partial class sdiSiteMaps : Form
+    public partial class sdiSiteMaps2 : Form
     {
         // FIELDS //
         private classSiteDatabase dbSite;
 
         // CONSTRUCTORS //
-        public sdiSiteMaps(classSiteDatabase inDB)
+        public sdiSiteMaps2(classSiteDatabase inDB)
         {
             InitializeComponent();
             dbSite = inDB;
-            loadGrid();
+            loadGrids();
             ShowDialog();
         }
 
@@ -38,8 +38,49 @@ namespace Site_Manager
         }
 
         // SUPPORT LOGIC //
+        private void loadGrids()
+        {
+            gridUnMaps.Rows.Clear();
+            gridMaps.Rows.Clear();
+            loadGridMapped(true);
+            loadGridUnmapped();
+        }
 
-        private void loadGrid()
+        private void loadGridUnmapped()
+        {
+            int row;
+
+            foreach (classIOS L in dbSite.Legacy)
+            {
+                foreach (classUnit U in L.Units)
+                {
+                    if (U.Assigned == false)
+                    {
+                        row = gridUnMaps.Rows.Add();
+                        gridUnMaps.Rows[row].Cells[0].Value = getCircuitType(U.Type2);
+                        gridUnMaps.Rows[row].Cells[1].Value = L.Hostname.ToUpper();
+                        gridUnMaps.Rows[row].Cells[2].Value = U.Prefix;
+                    }
+                }
+            }
+        }
+
+        private void loadGridMapped(bool TEST)
+        {
+            int row;
+
+            foreach (classMap M in dbSite.Maps)
+            {
+                row = gridMaps.Rows.Add();
+                gridMaps.Rows[row].Cells[0].Value = getCircuitType(M.Type2);
+                gridMaps.Rows[row].Cells[1].Value = M.Legacy.ToUpper();
+                gridMaps.Rows[row].Cells[2].Value = M.PrefixLegacy;
+                gridMaps.Rows[row].Cells[3].Value = M.ASR.ToUpper();
+                gridMaps.Rows[row].Cells[4].Value = M.PrefixASR;
+            }
+        }
+
+        private void loadGridMapped()
         {
             classSiteMapDB dbMap = dbSite.Maps;    
 
@@ -49,7 +90,6 @@ namespace Site_Manager
 
                 for (int m = 0; m < dbMap.Count; m++)
                 {
-                    //gridMaps.Rows[m].Cells[0].Value = getCircuitType(dbMap[m].Type);
                     gridMaps.Rows[m].Cells[0].Value = getCircuitType(dbMap[m].Type2);
                     gridMaps.Rows[m].Cells[1].Value = dbMap[m].Legacy.ToUpper();
                     gridMaps.Rows[m].Cells[2].Value = dbMap[m].PrefixLegacy;
@@ -126,5 +166,22 @@ namespace Site_Manager
         {
 
         }
+
+        private int countUnmapped()
+        {
+            int count = 0;
+
+            foreach(classIOS L in dbSite.Legacy)
+            {
+                foreach(classUnit U in L.Units)
+                {
+                    if (U.Assigned == false) count++;
+                }
+            }
+
+            return count;
+        }
+
+
     }
 }

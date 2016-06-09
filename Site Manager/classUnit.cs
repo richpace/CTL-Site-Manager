@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Site_Manager
 {
+    public enum UnitType { GE, CH, CL};
+
     public class classUnit
     {
         // FIELDS //
@@ -15,6 +17,10 @@ namespace Site_Manager
         private int unitWidth = 1;
         private bool unitActive = false;
         private bool unitAssigned = false;
+
+        private UnitType unitType2;
+        private bool unitAssignable = true;
+
         // CONSTRUCTORS //
         public classUnit(string inType, string inPrefix, int inWidth)
         {
@@ -23,9 +29,23 @@ namespace Site_Manager
             unitWidth = inWidth;
         }
 
+        public classUnit(UnitType inType, string inPrefix, int inWidth)
+        {
+            unitType2 = inType;
+            unitPrefix = inPrefix;
+            unitWidth = inWidth;
+        }
+
         public classUnit(string inType, string inPrefix, string inPort)
         {
             unitType = inType;
+            unitPrefix = inPrefix;
+            unitPort = inPort;
+        }
+
+        public classUnit(UnitType inType, string inPrefix, string inPort)
+        {
+            unitType2 = inType;
             unitPrefix = inPrefix;
             unitPort = inPort;
         }
@@ -61,6 +81,7 @@ namespace Site_Manager
                 //    return false;
                 //}
             }
+            set { unitAssigned = value; }
         }
 
         public string Prefix
@@ -91,6 +112,17 @@ namespace Site_Manager
             }
         }
 
+        public bool Assignable
+        {
+            get { return unitAssignable; }
+            set { unitAssignable = value; }
+        }
+
+        public UnitType Type2
+        {
+            get { return unitType2; }
+            //set { unitType2 = value; }
+        }
         // METHODS //
         public void Assign()
         {

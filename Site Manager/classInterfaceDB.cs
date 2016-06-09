@@ -27,7 +27,8 @@ namespace Site_Manager
         {
             get
             {
-                return (classIOSInterface)List[Contains(indexIntID)];
+                if (Contains(indexIntID) > -1) return (classIOSInterface)List[Contains(indexIntID)];
+                return null;
             }
         }
         // PROPERTIES //

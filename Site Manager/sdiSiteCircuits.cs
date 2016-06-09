@@ -180,7 +180,7 @@ namespace Site_Manager
 
                 for (int u = 0; u < ios.Units.Count; u++)
                 {
-                    if (ios.Units[u].Type == "STS-CH")
+                    if (ios.Units[u].Type2 == UnitType.CH)
                     {
                         nodeUnit = nodesCircuit(ios.Circuits, ios.Units[u], true);
                         if (nodeUnit.Nodes.Count > 0)
@@ -212,7 +212,7 @@ namespace Site_Manager
                 treeMON.Nodes.Add(nodeIOS);
                 for (int u = 0; u < ios.Units.Count; u++)
                 {
-                    if (ios.Units[u].Type == "STS-CL")
+                    if (ios.Units[u].Type2 == UnitType.CL)
                     {
                         nodeUnit = nodesCircuit(ios.Circuits, ios.Units[u], true);
                         if (nodeUnit.Nodes.Count > 0)
@@ -244,7 +244,7 @@ namespace Site_Manager
                 treePHY.Nodes.Add(nodeIOS);
                 for (int u = 0; u < ios.Units.Count; u++)
                 {
-                    if (ios.Units[u].Type == "GE")
+                    if (ios.Units[u].Type2 == UnitType.GE)
                     {
                         nodeUnit = nodesCircuit(ios.Circuits, ios.Units[u], true);
                         if (nodeUnit.Nodes.Count > 0)

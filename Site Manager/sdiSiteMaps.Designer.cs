@@ -54,6 +54,7 @@
             this.gridMaps.Size = new System.Drawing.Size(575, 400);
             this.gridMaps.TabIndex = 0;
             this.gridMaps.TabStop = false;
+            this.gridMaps.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridMaps_CellClick);
             // 
             // gridcolumnType
             // 

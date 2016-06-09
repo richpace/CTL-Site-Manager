@@ -12,10 +12,18 @@ namespace Site_Manager
         private string unitType;
         private int unitSlot;
 
+        private UnitType unitType2;
+
         // CONSTRUCTORS //
         public classIOXUnit(int inSlot, string inType)
         {
             unitType = inType;
+            unitSlot = inSlot;
+        }
+
+        public classIOXUnit(int inSlot, UnitType inType)
+        {
+            unitType2 = inType;
             unitSlot = inSlot;
         }
 
@@ -26,6 +34,11 @@ namespace Site_Manager
             {
                 return unitType;
             }
+        }
+
+        public UnitType Type2
+        {
+            get { return unitType2; }
         }
     }
 }

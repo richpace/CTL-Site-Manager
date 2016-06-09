@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -118,6 +118,12 @@
     <Compile Include="sdiSiteCircuits.Designer.cs">
       <DependentUpon>sdiSiteCircuits.cs</DependentUpon>
     </Compile>
+    <Compile Include="sdiSiteMaps2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="sdiSiteMaps2.Designer.cs">
+      <DependentUpon>sdiSiteMaps2.cs</DependentUpon>
+    </Compile>
     <Compile Include="sdiSiteMaps.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -151,6 +157,9 @@
     <EmbeddedResource Include="sdiSiteCircuits.resx">
       <DependentUpon>sdiSiteCircuits.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="sdiSiteMaps2.resx">
+      <DependentUpon>sdiSiteMaps2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="sdiSiteMaps.resx">
       <DependentUpon>sdiSiteMaps.cs</DependentUpon>
     </EmbeddedResource>
@@ -170,16 +179,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Visual Studio 2008\Projects\Internet Protocol\Internet Protocol.csproj">
-      <Project>{784e8141-fdd4-4aed-a90f-c6208359faa9}</Project>
-      <Name>Internet Protocol</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cisco Device\Cisco Device.csproj">
-      <Project>{598ea178-e8b8-4e9f-a2d0-2e4a06bfe8da}</Project>
-      <Name>Cisco Device</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
@@ -221,6 +220,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CTL-Config-Builder\Cisco Device\Cisco Device.csproj">
+      <Project>{598ea178-e8b8-4e9f-a2d0-2e4a06bfe8da}</Project>
+      <Name>Cisco Device</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CTL-Config-Builder\Internet Protocol\Internet Protocol.csproj">
+      <Project>{784e8141-fdd4-4aed-a90f-c6208359faa9}</Project>
+      <Name>Internet Protocol</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

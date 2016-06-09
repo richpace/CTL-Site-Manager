@@ -77,8 +77,9 @@ namespace Site_Manager
         {
             int unitWidth = inUnit.Width;
             string unitType = inUnit.Type;
+            UnitType unitType2 = inUnit.Type2;
 
-            switch (unitType)
+            switch (unitType2)
             {
                 //case "STS-CH":
                 //    for (int u = 0; u < Units.Count; u++)
@@ -89,10 +90,10 @@ namespace Site_Manager
                 //        }
                 //    }
                 //    break;
-                case "STS-CL":
+                case  UnitType.CL:
                     for (int u = 0; u < Units.Count; u++)
                     {
-                        if ((Units[u].Type == unitType) && (Units[u].Assigned == false))
+                        if ((Units[u].Type2 == unitType2) && (Units[u].Assigned == false) && (Units[u].Assignable == true))
                         {
                             if (unitWidth == 1)
                             {
@@ -105,7 +106,7 @@ namespace Site_Manager
 
                                 for (int s = 0; s<unitWidth; s++)
                                 {
-                                    if (Units[u + s].Assigned == false && Units[u + s].Port == unitPort)
+                                    if (Units[u + s].Assigned == false && Units[u + s].Port == unitPort && (Units[u+s].Assignable == true))
                                     {
                                         ch++;
                                     }
@@ -130,7 +131,7 @@ namespace Site_Manager
                 default:
                     for (int u = 0; u < Units.Count; u++)
                     {
-                        if ((Units[u].Type == unitType) && (Units[u].Assigned == false))
+                        if ((Units[u].Type2 == unitType2) && (Units[u].Assigned == false)&&(Units[u].Assignable==true))
                         {
                             return Units[u];
                         }
@@ -214,6 +215,8 @@ namespace Site_Manager
             string unitPrefix = null;
             string unitType = null;
 
+            UnitType unitType2;
+
             for (int c = 0; c <= ioxCards.GetUpperBound(0); c++)
             {
                 if (ioxCards[c] != null)
@@ -231,17 +234,20 @@ namespace Site_Manager
                                     {
                                         if (ioxCards[c].PA[pa].Port[p].Unit[u] != null)
                                         {
-                                            unitType = ioxCards[c].PA[pa].Port[p].Unit[u].Type;
-                                            switch (unitType)
+                                            //unitType = ioxCards[c].PA[pa].Port[p].Unit[u].Type;
+                                            unitType2 = ioxCards[c].PA[pa].Port[p].Unit[u].Type2;
+
+                                            switch (unitType2)
                                             {
-                                                case "GE":
+                                                case UnitType.GE:
                                                     unitPrefix = "0/" + c.ToString() + "/" + pa.ToString() + "/" + p.ToString();
                                                     break;
                                                 default:
                                                     unitPrefix = "0/" + c.ToString() + "/" + pa.ToString() + "/" + p.ToString() + "/" + (u + 1).ToString();
                                                     break;
                                             }
-                                            ioxUnits.Add(unitType, unitPrefix, unitPort);
+                                            //ioxUnits.Add(unitType, unitPrefix, unitPort);
+                                            ioxUnits.Add(unitType2, unitPrefix, unitPort);
                                             //ioxUnits.Add(unitType, unitPrefix);
                                         }
                                     }

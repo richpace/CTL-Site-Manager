@@ -31,18 +31,17 @@ namespace Site_Manager
             addMap(inMap);
         }
 
-        //public bool Add(classDeviceUnit inUnitLegacy, classDeviceUnit inUnitASR)
-        //{
-        //    try
-        //    {
-        //        addMap(inUnitLegacy, inUnitASR);
-        //        return true;
-        //    }
-        //    catch
-        //    {
-        //        return false;
-        //    }
-        //}
+        public int ASRIndex(string inASR, string inPrefix)
+        {
+            classMap M;
+
+            for (int m = 0; m < List.Count; m++)
+            {
+                M = (classMap)List[m];
+                if ((M.PrefixASR == inPrefix) && (M.ASR == inASR)) return m;
+            }
+            return -1;
+        }
 
         // SUPPORT LOGIC //
         private void addMap(classMap inMap)
@@ -50,10 +49,5 @@ namespace Site_Manager
             List.Add(inMap);
         }
 
-        //private void addMap(classDeviceUnit inUnitLegacy, classDeviceUnit inUnitASR)
-        //{
-        //    classMap newMap = new classMap();
-        //    List.Add(newMap);
-        //}
     }
 }

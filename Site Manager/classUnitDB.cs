@@ -78,12 +78,27 @@ namespace Site_Manager
             addUnit(inType, inPrefix, 1);
         }
 
+        public void Add(UnitType inType, string inPrefix)
+        {
+            addUnit(inType, inPrefix, 1);
+        }
+
         public void Add(string inType, string inPrefix, string inPort)
         {
             addUnit(inType, inPrefix, inPort);
         }
 
+        public void Add(UnitType inType, string inPrefix, string inPort)
+        {
+            addUnit(inType, inPrefix, inPort);
+        }
+
         public void Add(string inType, string inPrefix, int inWidth)
+        {
+            addUnit(inType, inPrefix, inWidth);
+        }
+
+        public void Add(UnitType inType, string inPrefix, int inWidth)
         {
             addUnit(inType, inPrefix, inWidth);
         }
@@ -174,6 +189,7 @@ namespace Site_Manager
         {
             string stsPrefix = inID;
             string stsType = "STS-CH";
+            UnitType stsType2 = UnitType.CH;
 
             string srLine;
             string[] srArray;
@@ -189,13 +205,13 @@ namespace Site_Manager
                         switch (srArray[1])
                         {
                             case "channelized":
-                                stsType = "STS-CL";
+                                stsType2 = UnitType.CL;
                                 break;
                         }
                         break;
                 }
             } while (srArray[0] != "!");
-            Add(stsType, stsPrefix);
+            Add(stsType2, stsPrefix);
             //addUnit(stsType, stsPrefix);
         }
 
@@ -204,6 +220,7 @@ namespace Site_Manager
             string contPrefix = inID;
             string stsPrefix = null;
             string stsType = "STS-CL";
+            UnitType stsType2 = UnitType.CL;
 
             string srLine;
             string[] srArray;
@@ -224,16 +241,19 @@ namespace Site_Manager
                             switch (srArray[0])
                             {
                                 case "tug-2":
-                                    Add(stsType, stsPrefix + "/" + srArray[1]);
+                                    //Add(stsType, stsPrefix + "/" + srArray[1]);
+                                    Add(stsType2, stsPrefix + "/" + srArray[1]);
                                     break;
                                 case "mode":
                                     switch (srArray[1])
                                     {
                                         case "c-12":
                                             stsType = "STS-CH";
+                                            stsType2 = UnitType.CH;
                                             break;
                                         case "t3":
                                             stsType = "STS-CL";
+                                            stsType2 = UnitType.CL;
                                             break;
                                     }
                                     break;
@@ -242,6 +262,7 @@ namespace Site_Manager
                         break;
                     case "sts-1":
                         stsType = "STS-CL";
+                        stsType2 = UnitType.CL;
                         stsPrefix = contPrefix + "." + srArray[1];
                         do
                         {
@@ -254,6 +275,7 @@ namespace Site_Manager
                                     {
                                         case "ct3":
                                             stsType = "STS-CH";
+                                            stsType2 = UnitType.CH;
                                             break;
                                         case "t3":
 
@@ -267,17 +289,38 @@ namespace Site_Manager
                                 break;
                             }
                         } while (srLine != " !");
-                        Add(stsType, stsPrefix);
+                        //Add(stsType, stsPrefix);
+                        Add(stsType2, stsPrefix);
                         break;
                 }
             } while (srLine != "!");
         }
 
+        private void addUnit(UnitType inType, string inPrefix, int inWidth)
+        {
+            classUnit unitNew = new classUnit(inType, inPrefix, inWidth);
 
+            if (this.Contains(unitNew.Prefix) == -1)
+            {
+                List.Add(unitNew);
+                unitNew.ActivateUnit();
+            }
+        }
 
         private void addUnit(string inType, string inPrefix, int inWidth)
         {
             classUnit unitNew = new classUnit(inType, inPrefix, inWidth);
+
+            if (this.Contains(unitNew.Prefix) == -1)
+            {
+                List.Add(unitNew);
+                unitNew.ActivateUnit();
+            }
+        }
+
+        private void addUnit(UnitType inType, string inPrefix, string inPort)
+        {
+            classUnit unitNew = new classUnit(inType, inPrefix, inPort);
 
             if (this.Contains(unitNew.Prefix) == -1)
             {
