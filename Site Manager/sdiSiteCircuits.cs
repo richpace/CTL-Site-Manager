@@ -16,19 +16,14 @@ namespace Site_Manager
     public partial class sdiSiteCircuits : Form
     {
         // FIELDS //
-        private classSiteDatabase dbSite;
-        private classIOSDB dbIOS;
-
-        private static int xlDCS;
-        private static int xlMON;
-        private static int xlPHY;
+        private classSiteDB dbSite;
 
         // CONSTRUCTORS //
-        public sdiSiteCircuits(classSiteDatabase inDB)
+        public sdiSiteCircuits(classSiteDB inDB)
         {
             InitializeComponent();
             dbSite = inDB;
-            dbIOS = dbSite.Legacy;
+            //dbIOS = dbSite.Legacy;
             loadWindow();
             treeDisplay();
             ShowDialog();
@@ -43,7 +38,7 @@ namespace Site_Manager
                 {
                     checkUnassigned(e.Node);
                     checkDCSMultilink(e.Node);
-                    checkDCSSubchannel(e.Node);
+                    checkDCSSubchannel(e.Node, false);
                 }
                 if (e.Node.Nodes.Count > 0) this.checkChildNodes(e.Node, e.Node.Checked);
                 if (e.Node.Parent != null) checkParentNode(e.Node.Parent);
@@ -91,26 +86,20 @@ namespace Site_Manager
 
             if (treeDCS.Nodes.Count > 0)
             {
-                for (int d = 0; d < treeDCS.Nodes.Count; d++)
-                {
-                    scheduleNodes(date, treeDCS.Nodes[d]);
-                }
+                foreach (TreeNode N in treeDCS.Nodes)
+                    if (N.Checked == true) scheduleNodes(date, N);
             }
 
             if (treeMON.Nodes.Count > 0)
             {
-                for (int d = 0; d < treeMON.Nodes.Count; d++)
-                {
-                    scheduleNodes(date, treeMON.Nodes[d]);
-                }
+                foreach (TreeNode N in treeMON.Nodes)
+                    if (N.Checked == true) scheduleNodes(date, N);
             }
 
             if (treePHY.Nodes.Count > 0)
             {
-                for (int d = 0; d < treePHY.Nodes.Count; d++)
-                {
-                    scheduleNodes(date, treePHY.Nodes[d]);
-                }
+                foreach (TreeNode N in treePHY.Nodes)
+                    if (N.Checked == true) scheduleNodes(date, N);
             }
 
             treeDisplay();
@@ -136,11 +125,36 @@ namespace Site_Manager
             this.Close();
         }
 
-        private void btnExcel_Click(object sender, EventArgs e)
+
+        private void cbDIV_CheckedChanged(object sender, EventArgs e)
         {
-            exportExcel();
+            treeDisplay();
         }
 
+        private void cbDense_CheckedChanged(object sender, EventArgs e)
+        {
+            treeDisplay();
+        }
+
+        private void cbMultilink_CheckedChanged(object sender, EventArgs e)
+        {
+            treeDisplay();
+        }
+
+        private void cbOther_CheckedChanged(object sender, EventArgs e)
+        {
+            treeDisplay();
+        }
+
+        private void cbScheduledOnly_CheckedChanged(object sender, EventArgs e)
+        {
+            treeDisplay();
+        }
+
+        private void textboxSearch_TextChanged(object sender, EventArgs e)
+        {
+            treeDisplay();
+        }
         // SUPPORT LOGIC //
         private void loadWindow()
         {
@@ -152,218 +166,232 @@ namespace Site_Manager
             cbScheduledOnly.Enabled = false;
         }
 
-        private void parseDB(classIOSDB inIOSDB)
-        {
-
-        }
-
         private void treeDisplay()
         {
             nodesCH();
-            nodesCL();
+            nodesMON();
             nodesGE();
         }
 
         private void nodesCH()
         {
-            classIOS ios;
-            TreeNode nodeIOS;
-            TreeNode nodeUnit;
-
             treeDCS.Nodes.Clear();
 
-            for (int d = 0; d < dbIOS.Count; d++)
+            foreach (KeyValuePair<string, classUnit> U in dbSite.WB.Units)
             {
-                ios = dbIOS[d];
-                nodeIOS = new TreeNode(ios.Hostname);
-                treeDCS.Nodes.Add(nodeIOS);
-
-                for (int u = 0; u < ios.Units.Count; u++)
+                if (U.Value.Type == UnitType.DCS)
                 {
-                    if (ios.Units[u].Type2 == UnitType.CH)
+                    foreach (KeyValuePair<string, classCircuit> CX in dbSite.WB)
                     {
-                        nodeUnit = nodesCircuit(ios.Circuits, ios.Units[u], true);
-                        if (nodeUnit.Nodes.Count > 0)
+                        if (CX.Value.Unit == U.Key)
                         {
-                            nodeIOS.Nodes.Add(nodeUnit);
+                            if (displayNode(CX.Value) == true)
+                            {
+                                if (treeDCS.Nodes.ContainsKey(CX.Value.Device) == false)
+                                {
+                                    treeDCS.Nodes.Add(CX.Value.Device, CX.Value.Device);
+                                }
+                                TreeNode nodeLegacy = treeDCS.Nodes[CX.Value.Device];
+                                nodeLegacy.Tag = "DEVICE";
+
+                                string sts = CX.Value.STS.ToUpper().Replace("SERIAL", "");
+                                if (nodeLegacy.Nodes.ContainsKey(sts) == false)
+                                {
+                                    nodeLegacy.Nodes.Add(sts, sts);
+                                }
+                                TreeNode nodeSTS = nodeLegacy.Nodes[sts];
+                                nodeSTS.Tag = "STS";
+
+                                string ds1 = CX.Value.DS1.ToUpper().Replace("SERIAL", "");
+                                switch (CX.Value.Type)
+                                {
+                                    case typeCircuit.xDS1:
+                                        nodeSTS.Nodes.Add(ds1, CX.Value.DS1 + ": " + CX.Value.ID + " - " + CX.Value.Customer);
+                                        //nodeSTS.Nodes[ds1].Tag = CX.Value.Unit + "*" + CX.Value.ID;
+                                        nodeSTS.Nodes[ds1].Tag = CX.Value.Unit;
+                                        if (CX.Value.MigrationDate.Year > 1)
+                                        {
+                                            nodeSTS.Nodes[ds1].ForeColor = Color.Blue;
+                                            nodeSTS.Nodes[ds1].Parent.Expand();
+                                        }
+                                        break;
+                                    case typeCircuit.xDS0:
+                                        string ds0 = CX.Value.Interface.ToUpper().Replace("SERIAL", "");
+                                        if (nodeSTS.Nodes.ContainsKey(ds1) == false)
+                                        {
+                                            nodeSTS.Nodes.Add(ds1, CX.Value.DS1);
+                                            nodeSTS.Nodes[ds1].Tag = "DS1.CH";
+                                        }
+                                        TreeNode nodeDS1 = nodeSTS.Nodes[ds1];
+                                        nodeDS1.Nodes.Add(ds0, CX.Value.Interface + ": " + CX.Value.ID + " - " + CX.Value.Customer);
+                                        //nodeDS1.Nodes[ds0].Tag = CX.Value.Unit + "*" + CX.Value.ID;
+                                        nodeDS1.Nodes[ds0].Tag = CX.Value.Unit ;
+                                        if (CX.Value.MigrationDate.Year > 1)
+                                        {
+                                            nodeDS1.Nodes[ds0].ForeColor = Color.Blue;
+                                            nodeDS1.Nodes[ds0].Parent.Expand();
+                                        }
+                                        break;
+                                }
+                            }
                         }
                     }
                 }
-                if (nodeIOS.Nodes.Count == 0)
-                {
-                    nodeIOS.Remove();
-                }
             }
+
             treeDCS.Sort();
         }
 
-        private void nodesCL()
+        private void nodesMON()
         {
-            classIOS ios;
-            TreeNode nodeIOS;
-            TreeNode nodeUnit;
-
             treeMON.Nodes.Clear();
 
-            for (int d = 0; d < dbIOS.Count; d++)
+            foreach (KeyValuePair<string, classUnit> U in dbSite.WB.Units)
             {
-                ios = dbIOS[d];
-                nodeIOS = new TreeNode(ios.Hostname);
-                treeMON.Nodes.Add(nodeIOS);
-                for (int u = 0; u < ios.Units.Count; u++)
+                if (U.Value.Type== UnitType.MON)
                 {
-                    if (ios.Units[u].Type2 == UnitType.CL)
+                    foreach (KeyValuePair<string, classCircuit> CX in dbSite.WB)
                     {
-                        nodeUnit = nodesCircuit(ios.Circuits, ios.Units[u], true);
-                        if (nodeUnit.Nodes.Count > 0)
+                        if (CX.Value.Unit == U.Key)
                         {
-                            nodeIOS.Nodes.Add(nodeUnit);
+                            if (displayNode(CX.Value) == true)
+                            {
+                                if (treeMON.Nodes.ContainsKey(CX.Value.Device) == false)
+                                {
+                                    treeMON.Nodes.Add(CX.Value.Device, CX.Value.Device);
+                                }
+                                TreeNode nodeLegacy = treeMON.Nodes[CX.Value.Device];
+                                nodeLegacy.Tag = "DEVICE";
+
+                                if (CX.Value.Subinterface == false)
+                                {
+                                    string sts = CX.Value.Interface.ToUpper().Replace("SERIAL", "");
+                                    sts = sts.ToUpper().Replace("POS", "");
+                                    nodeLegacy.Nodes.Add(sts, CX.Value.Interface + ": " + CX.Value.ID + " - " + CX.Value.Customer);
+                                    nodeLegacy.Nodes[sts].Tag = CX.Value.Unit + "*" + CX.Value.ID;
+                                    if (CX.Value.MigrationDate.Year > 1)
+                                    {
+                                        nodeLegacy.Nodes[sts].ForeColor = Color.Blue;
+                                        nodeLegacy.Nodes[sts].Parent.Expand();
+                                    }
+                                }
+                                else
+                                {
+                                    string sts = CX.Value.Carrier.ToUpper().Replace("SERIAL", "");
+                                    sts = sts.ToUpper().Replace("POS", "");
+                                    if (nodeLegacy.Nodes.ContainsKey(sts) == false)
+                                    {
+                                        nodeLegacy.Nodes.Add(sts, CX.Value.Carrier);
+                                        nodeLegacy.Nodes[sts].Tag = "STS";
+                                    }
+                                    TreeNode nodeSTS = nodeLegacy.Nodes[sts];
+
+                                    string key = CX.Value.Interface.ToUpper().Replace("SERIAL", "");
+                                    sts = sts.ToUpper().Replace("POS", "");
+                                    nodeSTS.Nodes.Add(key, CX.Value.Interface + ": " + CX.Value.ID + " - " + CX.Value.Customer);
+                                    nodeSTS.Nodes[key].Tag = CX.Value.Unit + "*" + CX.Value.ID;
+                                    if (CX.Value.MigrationDate.Year > 1)
+                                    {
+                                        nodeLegacy.Nodes[sts].ForeColor = Color.Blue;
+                                        nodeLegacy.Nodes[sts].Parent.Expand();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                if (nodeIOS.Nodes.Count == 0)
-                {
-                    nodeIOS.Remove();
-                }
             }
+
             treeMON.Sort();
         }
 
         private void nodesGE()
         {
-            classIOS ios;
-            TreeNode nodeIOS;
-            TreeNode nodeUnit;
-
             treePHY.Nodes.Clear();
 
-            for (int d = 0; d < dbIOS.Count; d++)
+            foreach (KeyValuePair<string, classUnit> U in dbSite.WB.Units)
             {
-                ios = dbIOS[d];
-                nodeIOS = new TreeNode(ios.Hostname);
-                treePHY.Nodes.Add(nodeIOS);
-                for (int u = 0; u < ios.Units.Count; u++)
+                if (U.Value.Type == UnitType.GE)
                 {
-                    if (ios.Units[u].Type2 == UnitType.GE)
+                    foreach (KeyValuePair<string, classCircuit> CX in dbSite.WB)
                     {
-                        nodeUnit = nodesCircuit(ios.Circuits, ios.Units[u], true);
-                        if (nodeUnit.Nodes.Count > 0)
+                        if (CX.Value.Unit == U.Key)
                         {
-                            nodeIOS.Nodes.Add(nodeUnit);
+                            if (displayNode(CX.Value) == true)
+                            {
+                                if (treePHY.Nodes.ContainsKey(CX.Value.Device) == false)
+                                {
+                                    treePHY.Nodes.Add(CX.Value.Device, CX.Value.Device);
+                                }
+                                TreeNode nodeLegacy = treePHY.Nodes[CX.Value.Device];
+                                nodeLegacy.Tag = "DEVICE";
+
+                                if (CX.Value.Subinterface == false)
+                                {
+                                    string ge = CX.Value.Interface.ToUpper().Replace("GIGABITETHERNET", "");
+                                    nodeLegacy.Nodes.Add(ge, CX.Value.Interface + ": " + CX.Value.ID + " - " + CX.Value.Customer);
+                                    nodeLegacy.Nodes[ge].Tag = CX.Value.Unit + "*" + CX.Value.ID;
+                                    if (CX.Value.MigrationDate.Year > 1)
+                                    {
+                                        nodeLegacy.Nodes[ge].ForeColor = Color.Blue;
+                                        nodeLegacy.Nodes[ge].Parent.Expand();
+                                    }
+                                }
+                                else
+                                {
+                                    string ge = CX.Value.Carrier.ToUpper().Replace("GIGABITETHERNET", "");
+                                    if (nodeLegacy.Nodes.ContainsKey(ge) == false)
+                                    {
+                                        nodeLegacy.Nodes.Add(ge, CX.Value.Carrier);
+                                        nodeLegacy.Nodes[ge].Tag = "GE";
+                                    }
+                                    TreeNode nodeGE = nodeLegacy.Nodes[ge];
+
+                                    ge = CX.Value.Interface.ToUpper().Replace("GIGABITETHERNET", "");
+                                    nodeGE.Nodes.Add(ge, CX.Value.Interface + ": " + CX.Value.ID + " - " + CX.Value.Customer);
+                                    nodeGE.Nodes[ge].Tag = CX.Value.Unit + "*" + CX.Value.ID;
+                                    if (CX.Value.MigrationDate.Year > 1)
+                                    {
+                                        nodeGE.Nodes[ge].ForeColor = Color.Blue;
+                                        nodeGE.Nodes[ge].Parent.Expand();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                if (nodeIOS.Nodes.Count == 0)
-                {
-                    nodeIOS.Remove();
-                }
             }
+
             treePHY.Sort();
         }
 
-        private void nodesSubinterfaces(TreeNode inNode, classInterfaceDB inSubs)
+        private bool displayNode(classCircuit inCX)
         {
-            TreeNode nodeSub;
+            bool nodeVisible = true;
 
-            for (int s = 0; s < inSubs.Count; s++)
-            {
-                string textNode = inSubs[s].ID + ": " + inSubs[s].CircuitID + " - " + inSubs[s].Customer;
-                nodeSub = new TreeNode(textNode);
-                nodeSub.Tag = inSubs[s];
-                inNode.Nodes.Add(nodeSub);
-            }
+
+            nodeVisible = (inCX.Customer.Contains(textboxSearch.Text.ToUpper()) == true || inCX.ID.Contains(textboxSearch.Text.ToUpper()) == true);
+
+            if (inCX.MigrationDate.Year != 1) nodeVisible = cbDisplayScheduled.Checked;
+
+            if (inCX.Diversity == true) nodeVisible = cbDIV.Checked && nodeVisible;
+            if (inCX.Type == typeCircuit.xDS0) nodeVisible = cbDense.Checked && nodeVisible;
+            if (inCX.MultilinkID != null) nodeVisible = cbMultilink.Checked && nodeVisible;
+
+            if (inCX.Diversity == false && inCX.Type != typeCircuit.xDS0 && inCX.MultilinkID == null) nodeVisible = cbOther.Checked && nodeVisible;
+
+            if (inCX.MigrationDate.Year == 1) nodeVisible = !cbScheduledOnly.Checked && nodeVisible;
+
+            return nodeVisible;
         }
 
-        private bool displayNode(classIOSInterface inInt)
+        private void checkDCSSubchannel(TreeNode inNode, bool newsub)
         {
-            bool passInt = true;
-
-            if (inInt.MigrationDate.Year != 1) passInt = cbDisplayScheduled.Checked;
-
-            if (inInt.Diversity == true) passInt = cbDIV.Checked && passInt;
-            if (inInt.SubChannel != null) passInt = cbDense.Checked && passInt;
-            if (inInt.MultilinkGroup != null) passInt = cbMultilink.Checked && passInt;
-
-            if (inInt.Diversity == false && inInt.SubChannel == null && inInt.MultilinkGroup == null) passInt = cbOther.Checked && passInt;
-
-            if (inInt.MigrationDate.Year == 1) passInt = !cbScheduledOnly.Checked && passInt;
-
-            return passInt;
-        }
-
-        private TreeNode nodesCircuit(classInterfaceDB inInt, classUnit inUnit, bool NEW)
-        {
-            TreeNode nodeUnit = new TreeNode(inUnit.Prefix);
-            classIOSInterface intCircuit;
-
-            if (inUnit.Assigned == false)
+            if (inNode.Level == 3)
             {
-                nodeUnit.ForeColor = Color.Red;
-                nodeUnit.Expand();
-                nodeUnit.EnsureVisible();
-            }
-
-            for (int c = 0; c < inInt.Count; c++)
-            {
-                intCircuit = inInt[c];
-                if (intCircuit.Unit == inUnit.Prefix && displayNode(intCircuit) == true)
+                foreach (TreeNode N in inNode.Parent.Nodes)
                 {
-                    string nodeText = intCircuit.ID + ": " + intCircuit.CircuitID + " - " + intCircuit.Customer;
-
-                    if (textboxSearch.Text.Length == 0)
-                    {
-                        TreeNode nodeCircuit = new TreeNode(nodeText);
-
-                        if (intCircuit.MigrationDate.Year != 1)
-                            nodeCircuit.ForeColor = Color.Blue;
-                        else
-                            nodeCircuit.ForeColor = nodeUnit.ForeColor;
-                        nodeCircuit.Tag = intCircuit;
-                        if (intCircuit.SubInterfaces.Count > 0)
-                        {
-                            nodesSubinterfaces(nodeCircuit, intCircuit.SubInterfaces);
-                        }
-
-                        nodeUnit.Nodes.Add(nodeCircuit);
-                    }
-                    else
-                    {
-                        if (nodeText.ToLower().Contains(textboxSearch.Text.ToLower()) == true)
-                        {
-                            TreeNode nodeCircuit = new TreeNode(nodeText);
-
-                            if (intCircuit.MigrationDate.Year != 1)
-                                nodeCircuit.ForeColor = Color.Blue;
-                            else
-                                nodeCircuit.ForeColor = nodeUnit.ForeColor;
-                            nodeCircuit.Tag = intCircuit;
-                            if (intCircuit.SubInterfaces.Count > 0)
-                            {
-                                nodesSubinterfaces(nodeCircuit, intCircuit.SubInterfaces);
-                            }
-
-                            nodeUnit.Nodes.Add(nodeCircuit);
-                            nodeUnit.Expand();
-                        }
-                    }
-                }
-            }
-
-            return nodeUnit;
-        }
-
-        private void checkDCSSubchannel(TreeNode inNode)
-        {
-            classIOSInterface intNode = (classIOSInterface)inNode.Tag;
-            TreeNode nodeUnit = inNode.Parent;
-            classIOSInterface intCircuit;
-
-            if (intNode.SubChannel != null)
-            {
-                for (int n = 0; n < nodeUnit.Nodes.Count; n++)
-                {
-                    intCircuit = (classIOSInterface)nodeUnit.Nodes[n].Tag;
-                    if (intCircuit.SubChannel == intNode.SubChannel) nodeUnit.Nodes[n].Checked = inNode.Checked;
+                    N.Checked = inNode.Checked;
                 }
             }
         }
@@ -425,324 +453,74 @@ namespace Site_Manager
 
         private void checkDCSMultilink(TreeNode inNode)
         {
-            classIOSInterface intNode = (classIOSInterface)inNode.Tag;
-
-            if (intNode.MultilinkGroup != null)
+            if (inNode.Level == 2 && (string)inNode.Tag != "DS1.CH")
             {
-                string ml = intNode.MultilinkGroup;
-                for (int d = 0; d < treeDCS.Nodes.Count; d++)
+                string mlID = dbSite.WB.Units[(string)inNode.Tag].Multilink;
+
+                if (mlID != null)
                 {
-                    TreeNode nd = treeDCS.Nodes[d];
-                    if (nd.Nodes.Count > 0)
+                    string mlDevice = mlID.Split(":".ToCharArray())[0];
+
+                    foreach (TreeNode N in treeDCS.Nodes[mlDevice].Nodes)
                     {
-                        for (int u = 0; u < nd.Nodes.Count; u++)
+                        switch ((string)N.Tag)
                         {
-                            TreeNode nu = nd.Nodes[u];
-                            if (nu.Nodes.Count > 0)
-                            {
-                                for (int c = 0; c < nu.Nodes.Count; c++)
+                            case "STS":
+                                foreach (TreeNode NN in N.Nodes)
                                 {
-                                    TreeNode nc = nu.Nodes[c];
-                                    if (nc.Nodes.Count > 0)
-                                    {
-                                        for (int s = 0; s < nc.Nodes.Count; s++)
-                                        {
-                                            TreeNode ns = nc.Nodes[s];
-                                            classIOSInterface intS = (classIOSInterface)ns.Tag;
-                                            if (intS.MultilinkGroup == ml) ns.Checked = inNode.Checked;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        classIOSInterface intC = (classIOSInterface)nc.Tag;
-                                        if (intC.MultilinkGroup == ml) nc.Checked = inNode.Checked;
-                                    }
+
+                                    if ((NN.Tag != null && (string)NN.Tag !="DS1.CH") && dbSite.WB.Units[(string)NN.Tag].Multilink == mlID) NN.Checked = inNode.Checked;
+                                    //else
+                                    //{
+
+                                    //}
                                 }
-                            }
+
+                                break;
+                            default:
+
+                                break;
                         }
                     }
                 }
+
+
             }
+
         }
 
         private void scheduleNodes(DateTime inDate, TreeNode inNode)
         {
-            if (inNode.Level > 1)
+            if (inNode.Checked == true)
             {
-                if (inNode.Checked == true)
+                switch ((string)inNode.Tag)
                 {
-                    classIOSInterface i = (classIOSInterface)inNode.Tag;
+                    case "DEVICE":
+                        foreach (TreeNode N in inNode.Nodes)
+                            if (N.Checked == true) scheduleNodes(inDate, N);
+                        break;
+                    case "STS":
+                        foreach (TreeNode N in inNode.Nodes)
+                            if (N.Checked == true) scheduleNodes(inDate, N);
+                        break;
+                    case "DS1.CH":
+                        foreach (TreeNode N in inNode.Nodes)
+                            if (N.Checked == true) scheduleNodes(inDate, N);
+                        break;
+                    case "GE":
+                        foreach (TreeNode N in inNode.Nodes)
+                            if (N.Checked == true) scheduleNodes(inDate, N);
+                        break;
+                    default:
+                        string cc = (string)inNode.Tag;
+                        //cc = cc.Split("*".ToCharArray()).Last().Trim();
+                        string ccc = inNode.Text.Split(" ".ToCharArray())[1];
 
-                    i.MigrationDate = inDate;
+                        classCircuit CX = dbSite.WB[ccc];
+                        CX.MigrationDate = inDate;
+                        break;
                 }
             }
-            if (inNode.Nodes.Count > 0)
-            {
-                for (int n = 0; n < inNode.Nodes.Count; n++)
-                {
-                    scheduleNodes(inDate, inNode.Nodes[n]);
-                }
-            }
-        }
-
-        private classMap getMap(string inLID, string inLINT)
-        {
-            for (int m = 0; m < dbSite.Maps.Count; m++)
-            {
-                if (dbSite.Maps[m].Legacy == inLID.ToLower() && dbSite.Maps[m].PrefixLegacy == inLINT)
-                {
-                    return dbSite.Maps[m];
-                }
-            }
-            return null;
-        }
-
-        private void exportExcel()
-        {
-            Microsoft.Office.Interop.Excel.Application XL = new Microsoft.Office.Interop.Excel.Application();
-            Workbook wbXL = XL.Workbooks.Add();
-            Worksheet wsPHY = excelPHY(wbXL);
-            Worksheet wsMON = excelMON(wbXL);
-            Worksheet wsDCS = excelDCS(wbXL);
-            xlDCS = 3;
-            xlMON = 3;
-            xlPHY = 3;
-
-            classIOS devLegacy;
-            classIOSInterface intLegacy;
-
-            for (int d = 0; d<dbSite.Legacy.Count; d++)
-            {
-                devLegacy = dbSite.Legacy[d];
-                for (int c = 0; c < devLegacy.Circuits.Count; c++)
-                {
-                    intLegacy = devLegacy.Circuits[c];
-                    if (intLegacy.Unit != null && devLegacy.Units[intLegacy.Unit].Assigned == true)
-                    {
-                        switch (devLegacy.Units[intLegacy.Unit].Type)
-                        {
-                            case "STS-CH":
-                                excelDCSInt(wsDCS, intLegacy, devLegacy.Hostname);
-                                break;
-                            case "STS-CL":
-                                excelMONInt(wsMON, intLegacy, devLegacy.Hostname);
-                                break;
-                            case "GE":
-                                excelPHYInt(wsPHY, intLegacy, devLegacy.Hostname);
-                                break;
-                        }
-                    }
-                }
-            }
-
-            wsDCS.Cells.EntireColumn.HorizontalAlignment = HorizontalAlignment.Center;
-            wsDCS.Rows[2].AutoFilter();
-            wsDCS.Cells.EntireColumn.AutoFit();
-            wsDCS.Activate();
-            XL.ActiveWindow.SplitRow = 2;
-            XL.ActiveWindow.FreezePanes = true;
-
-            wsMON.Cells.EntireColumn.HorizontalAlignment = HorizontalAlignment.Center;
-            wsMON.Rows[2].AutoFilter();
-            wsMON.Cells.EntireColumn.AutoFit();
-            wsMON.Activate();
-            XL.ActiveWindow.SplitRow = 2;
-            XL.ActiveWindow.FreezePanes = true;
-
-            wsPHY.Cells.EntireColumn.HorizontalAlignment = HorizontalAlignment.Center;
-            wsPHY.Rows[2].AutoFilter();
-            wsPHY.Cells.EntireColumn.AutoFit();
-            wsPHY.Activate();
-            XL.ActiveWindow.SplitRow = 2;
-            XL.ActiveWindow.FreezePanes = true;
-
-            wbXL.Worksheets["Sheet1"].Delete();
-            wbXL.SaveAs(dbSite.Name + "-Site Circuits");
-            XL.WindowState = XlWindowState.xlMaximized;
-            XL.Visible = true;
-        }
-
-        private Worksheet excelDCS(Workbook inWB)
-        {
-            Worksheet wsDCS = inWB.Worksheets.Add();
-            wsDCS.Name = "DCS";
-
-            wsDCS.Range["A1:C1"].MergeCells = true;
-            wsDCS.Range["D1:G1"].MergeCells = true;
-            wsDCS.Range["H1:J1"].MergeCells = true;
-            wsDCS.Range["A1:C1"].Value = "(CUST)";
-            wsDCS.Range["D1:G1"].Value = "(FROM)";
-            wsDCS.Range["H1:J1"].Value = "(TO)";
-            wsDCS.Rows[1].Font.Bold = true;
-            wsDCS.Cells[2, 1].Value = "Customer";
-            wsDCS.Cells[2, 2].Value = "Circuit ID";
-            wsDCS.Cells[2, 3].Value = "Customer DCS Port";
-            wsDCS.Cells[2, 4].Value = "Legacy Device";
-            wsDCS.Cells[2, 5].Value = "STS";
-            wsDCS.Cells[2, 6].Value = "Legacy Interface";
-            wsDCS.Cells[2, 7].Value = "Legacy DCS Port";
-            wsDCS.Cells[2, 8].Value = "ASR Device";
-            wsDCS.Cells[2, 9].Value = "ASR Interface";
-            wsDCS.Cells[2, 10].Value = "ASR DCS Port";
-            wsDCS.Cells[2, 11].Value = "Engineering Order ID";
-            wsDCS.Rows[2].Font.Bold = true;
-
-            return wsDCS;
-        }
-
-        private Worksheet excelMON(Workbook inWB)
-        {
-            Worksheet wsMON = inWB.Worksheets.Add();
-
-            wsMON.Name = "MON";
-            wsMON.Range["A1:D1"].MergeCells = true;
-            wsMON.Range["E1:G1"].MergeCells = true;
-            wsMON.Range["H1:J1"].MergeCells = true;
-            wsMON.Range["A1:D1"].Value = "(CUST)";
-            wsMON.Range["E1:G1"].Value = "(FROM)";
-            wsMON.Range["H1:J1"].Value = "(TO)";
-            wsMON.Rows[1].Font.Bold = true;
-            wsMON.Cells[2, 1].Value = "Customer";
-            wsMON.Cells[2, 2].Value = "Circuit ID";
-            wsMON.Cells[2, 3].Value = "MON ID";
-            wsMON.Cells[2, 4].Value = "Customer MON Port";
-            wsMON.Cells[2, 5].Value = "Legacy Device";
-            wsMON.Cells[2, 6].Value = "Legacy Interface";
-            wsMON.Cells[2, 7].Value = "Legacy MON Port";
-            wsMON.Cells[2, 8].Value = "ASR Device";
-            wsMON.Cells[2, 9].Value = "ASR Interface";
-            wsMON.Cells[2, 10].Value = "ASR MON Port";
-            wsMON.Cells[2, 11].Value = "Engineering Order ID";
-            wsMON.Rows[2].Font.Bold = true;
-
-            return wsMON;
-        }
-
-        private Worksheet excelPHY(Workbook inWB)
-        {
-            Worksheet wsPHY = inWB.Worksheets.Add();
-
-            wsPHY.Name = "PHY";
-            wsPHY.Range["C1:D1"].MergeCells = true;
-            wsPHY.Range["E1:F1"].MergeCells = true;
-            wsPHY.Range["H1:I1"].MergeCells = true;
-            wsPHY.Range["C1:D1"].Value = "(FROM)";
-            wsPHY.Range["E1:F1"].Value = "(CUST)";
-            wsPHY.Range["H1:I1"].Value = "(TO)";
-            wsPHY.Rows[1].Font.Bold = true;
-            wsPHY.Cells[2, 1].Value = "Customer";
-            wsPHY.Cells[2, 2].Value = "Circuit ID";
-            wsPHY.Cells[2, 3].Value = "Legacy Device";
-            wsPHY.Cells[2, 4].Value = "Legacy Interface";
-            wsPHY.Cells[2, 5].Value = "FDP";
-            wsPHY.Cells[2, 6].Value = "FDP Port";
-            wsPHY.Cells[2, 7].Value = "Color Code";
-            wsPHY.Cells[2, 8].Value = "ASR Device";
-            wsPHY.Cells[2, 9].Value = "ASR Interface";
-            wsPHY.Cells[2, 10].Value = "Engineering Order ID";
-            wsPHY.Rows[2].Font.Bold = true;
-
-            return wsPHY;
-        }
-
-        private void excelDCSInt(Worksheet inWS, classIOSInterface inInt, string inLDev)
-        {
-            classMap wsMap;
-
-            string intCUSTID = inInt.Customer;
-            string intCID = inInt.CircuitID;
-            string intLDEV = inLDev;
-            string intLINT = inInt.ID;
-            wsMap = getMap(intLDEV, inInt.Unit);
-            string intADEV = wsMap.ASR;
-            string intAINT = inInt.ID.Replace(inInt.Unit, wsMap.PrefixASR);
-
-            string intSTS = inInt.Type + inInt.Unit;
-
-            inWS.Cells[xlDCS, 1].Value = intCUSTID;
-            inWS.Cells[xlDCS, 2].Value = intCID;
-            inWS.Cells[xlDCS, 4].Value = intLDEV.ToUpper();
-            inWS.Cells[xlDCS, 5].Value = intSTS.ToUpper();
-            inWS.Cells[xlDCS, 6].Value = intLINT.ToUpper();
-            inWS.Cells[xlDCS, 8].Value = intADEV.ToUpper();
-            inWS.Cells[xlDCS, 9].Value = intAINT.ToUpper();
-            xlDCS++;
-        }
-
-        private void excelMONInt(Worksheet inWS, classIOSInterface inInt, string inLDev)
-        {
-            classMap wsMap;
-
-            string intCUSTID = inInt.Customer;
-            string intCID = inInt.CircuitID;
-            string intLDEV = inLDev;
-            string intLINT = inInt.ID;
-
-            wsMap = getMap(intLDEV, inInt.Unit);
-
-            string intADEV = wsMap.ASR.ToUpper();
-            string intAINT = inInt.ID.Replace(inInt.Unit, wsMap.PrefixASR);
-
-            inWS.Cells[xlMON, 1].Value = intCUSTID;
-            inWS.Cells[xlMON, 2].Value = intCID;
-            inWS.Cells[xlMON, 5].Value = intLDEV.ToUpper();
-            inWS.Cells[xlMON, 6].Value = intLINT.ToUpper();
-            inWS.Cells[xlMON, 8].Value = intADEV.ToUpper();
-            inWS.Cells[xlMON, 9].Value = intAINT.ToUpper();
-            xlMON++;
-        }
-
-        private void excelPHYInt(Worksheet inWS, classIOSInterface inInt, string inLDev)
-        {
-            classMap wsMap;
-
-            string intCUSTID = inInt.Customer;
-            string intCID = inInt.CircuitID;
-            string intLDEV = inLDev;
-            string intLINT = inInt.ID;
-
-            wsMap = getMap(intLDEV, inInt.Unit);
-
-            string intADEV = wsMap.ASR.ToUpper();
-            string intAINT = inInt.ID.Replace(inInt.Unit, wsMap.PrefixASR);
-
-            inWS.Cells[xlPHY, 1].Value = intCUSTID;
-            inWS.Cells[xlPHY, 2].Value = intCID;
-            inWS.Cells[xlPHY, 3].Value = intLDEV.ToUpper();
-            inWS.Cells[xlPHY, 4].Value = intLINT.ToUpper();
-            inWS.Cells[xlPHY, 8].Value = intADEV.ToUpper();
-            inWS.Cells[xlPHY, 9].Value = intAINT.ToUpper();
-            xlPHY++;
-        }
-
-        private void cbDIV_CheckedChanged(object sender, EventArgs e)
-        {
-            treeDisplay();
-        }
-
-        private void cbDense_CheckedChanged(object sender, EventArgs e)
-        {
-            treeDisplay();
-        }
-
-        private void cbMultilink_CheckedChanged(object sender, EventArgs e)
-        {
-            treeDisplay();
-        }
-
-        private void cbOther_CheckedChanged(object sender, EventArgs e)
-        {
-            treeDisplay();
-        }
-
-        private void cbScheduledOnly_CheckedChanged(object sender, EventArgs e)
-        {
-            treeDisplay();
-        }
-
-        private void textboxSearch_TextChanged(object sender, EventArgs e)
-        {
-            treeDisplay();
         }
     }
 }

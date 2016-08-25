@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using Microsoft.Office.Interop.Excel;
@@ -15,10 +9,10 @@ namespace Site_Manager
     public partial class sdiSiteSchedule : Form
     {
         // FIELDS //
-        private classSiteDatabase dbSite;
+        private classSiteDB dbSite;
 
         // CONSTRUCTORS //
-        public sdiSiteSchedule(classSiteDatabase inDB)
+        public sdiSiteSchedule(classSiteDB inDB)
         {
             InitializeComponent();
             dbSite = inDB;
@@ -37,109 +31,78 @@ namespace Site_Manager
             this.Close();
         }
 
+        private void treeSchedule_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (e.Action != TreeViewAction.Unknown)
+            {
+                switch (e.Node.Level)
+                {
+                    case 0:
+                        checkNodeChildren(e.Node);
+                        break;
+                    default:
+                        e.Node.Parent.Parent.Checked = e.Node.Checked;
+                        checkNodeChildren(e.Node.Parent.Parent);
+                        break;
+                }
+            }
+        }
+
         // SUPPORT LOGIC //
         private void displayTree()
         {
-            classIOSDB dbLeg = dbSite.Legacy;
-            classIOS devLeg;
-            classIOSInterface intLeg;
-
-            for (int d = 0; d < dbLeg.Count; d++)
-            {
-                devLeg = dbLeg[d];
-                for (int c = 0; c<devLeg.Circuits.Count; c++)
-                {
-                    intLeg = devLeg.Circuits[c];
-                    if (intLeg.MigrationDate.Year != 1)
-                    {
-                        postInterface(devLeg, intLeg);
-                    }
-                }
-            }
+            foreach (KeyValuePair<string, classCircuit> CX in dbSite.WB)
+                if (CX.Value.MigrationDate.Year > 1) postInterface(CX.Value);
 
             if (treeSchedule.Nodes.Count == 0)
             {
                 treeSchedule.CheckBoxes = false;
                 lblNothing.Visible = true;
+                btnCutsheet.Enabled = false;
             }
             else
             {
-                lblNothing.Visible = false;
                 treeSchedule.CheckBoxes = true;
+                lblNothing.Visible = false;
+                btnCutsheet.Enabled = true;
                 treeSchedule.Sort();
             }
         }
 
-        private classMap getMap(string inLID, string inLINT)
+        private void postInterface(classCircuit inCX)
         {
-            for (int m =0; m<dbSite.Maps.Count; m++)
+            string keyType;
+            classUnit U = dbSite.WB.Units[inCX.Unit];
+
+            string keyDate = inCX.MigrationDate.ToShortDateString();
+
+            if (treeSchedule.Nodes.ContainsKey(keyDate) == false)
+                treeSchedule.Nodes.Add(keyDate, keyDate);
+
+            TreeNode nodeDate = treeSchedule.Nodes[keyDate];
+
+            switch (inCX.Type)
             {
-                if (dbSite.Maps[m].Legacy == inLID.ToLower() && dbSite.Maps[m].PrefixLegacy == inLINT)
-                {
-                    return dbSite.Maps[m];
-                }
-            }
-            return null;
-        }
-
-        private void postInterface(classIOS inDev, classIOSInterface inInt)
-        {
-            TreeNode nodeInt = new TreeNode(inInt.Customer + "; " + inInt.CircuitID + "; " + inDev.Hostname.ToUpper());
-            nodeInt.Tag = inInt;
-
-            TreeNode nodeDate = getDateNode(inInt.MigrationDate.ToShortDateString(), inDev.Units[inInt.Unit].Type2);
-            nodeDate.Nodes.Add(nodeInt);
-        }
-
-        private TreeNode getDateNode(string inDate, UnitType inType)
-        {
-            string typeCX = getCircuitType(inType);
-            TreeNode nodeDate;
-            TreeNode nodeType;
-            if (treeSchedule.Nodes.Count !=0)
-            {
-                for (int n = 0; n < treeSchedule.Nodes.Count; n++)
-                {
-                    if ((string)treeSchedule.Nodes[n].Tag == inDate)
-                    {
-                        nodeDate = treeSchedule.Nodes[n];
-                        for (int t = 0; t < nodeDate.Nodes.Count; t++)
-                        {
-                            if ((string)nodeDate.Nodes[t].Tag == typeCX)
-                            {
-                                nodeType = nodeDate.Nodes[t];
-                                return nodeType;
-                            }
-                        }
-                        nodeType = new TreeNode(typeCX);
-                        nodeType.Tag = typeCX;
-                        nodeDate.Nodes.Add(nodeType);
-                        return nodeType;
-                    }
-                }
-            }
-            nodeDate = new TreeNode(inDate);
-            nodeDate.Tag = inDate;
-            nodeType = new TreeNode(typeCX);
-            nodeType.Tag = typeCX;
-            nodeDate.Nodes.Add(nodeType);
-            
-            treeSchedule.Nodes.Add(nodeDate);
-
-            return nodeType;
-        }
-
-        private string getCircuitType(UnitType inUnitType)
-        {
-            switch (inUnitType)
-            {
-                case UnitType.CH:
-                    return "DCS";
-                case UnitType.CL:
-                    return "MON";
+                case typeCircuit.Ethernet:
+                    keyType = "PHY";
+                    break;
+                case typeCircuit.xSTS:
+                    keyType = "MON";
+                    break;
                 default:
-                    return "PHY";
+                    keyType = "DCS";
+                    break;
             }
+
+            if (nodeDate.Nodes.ContainsKey(keyType) == false)
+                nodeDate.Nodes.Add(keyType, keyType);
+
+            TreeNode nodeType = nodeDate.Nodes[keyType];
+
+            string textCX = inCX.Customer + "; " + inCX.ID + "; " + inCX.Device;
+            string keyCX = inCX.ID;
+            nodeType.Nodes.Add(keyCX, textCX);
+            nodeType.Nodes[keyCX].Tag = keyCX +"*"+U.ID;
         }
 
         private void checkNodeChildren(TreeNode inNode)
@@ -149,36 +112,6 @@ namespace Site_Manager
                 inNode.Nodes[n].Checked = inNode.Checked;
                 if (inNode.Nodes[n].Nodes.Count > 0) checkNodeChildren(inNode.Nodes[n]);
             }
-        }
-
-        private void treeSchedule_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            if (e.Action != TreeViewAction.Unknown)
-            {
-                //if (e.Node.Level == 0) checkNodeChildren(e.Node);
-                //if (e.Node.Level == 1)
-                //{
-                //    e.Node.Parent.Checked = e.Node.Checked;
-                //    checkNodeChildren(e.Node.Parent);
-                //}
-                switch (e.Node.Level)
-                {
-                    case 0:
-                        checkNodeChildren(e.Node);
-                        //for (int t = 0; t < e.Node.Nodes.Count; t++) checkNodeChildren(e.Node.Nodes[t]);
-                        break;
-                    case 1:
-                        e.Node.Parent.Checked = e.Node.Checked;
-                        checkNodeChildren(e.Node.Parent);
-                        //for (int t = 0; t < e.Node.Nodes.Count; t++) checkNodeChildren(e.Node.Nodes[t]);
-                        break;
-                    case 2:
-                        e.Node.Parent.Parent.Checked = e.Node.Checked;
-                        checkNodeChildren(e.Node.Parent.Parent);
-                        break;
-                }
-            }
-
         }
 
         private string formatDate(string inDate)
@@ -239,19 +172,16 @@ namespace Site_Manager
             if (treeSchedule.Nodes.Count > 0)
             {
                 XL = new Microsoft.Office.Interop.Excel.Application();
-
                 for (int d = 0; d < treeSchedule.Nodes.Count; d++)
                 {
                     nodeDate = treeSchedule.Nodes[d];
-
                     if (nodeDate.Checked == true)
                     {
                         wbXL = XL.Workbooks.Add();
-
                         for (int t = 0; t < nodeDate.Nodes.Count; t++)
                         {
                             nodeType = nodeDate.Nodes[t];
-                            switch ((string)nodeType.Tag)
+                            switch (nodeType.Name)
                             {
                                 case "DCS":
                                     excelDCS(wbXL, nodeType);
@@ -275,9 +205,8 @@ namespace Site_Manager
         private void excelDCS(Workbook inWB, TreeNode inNode)
         {
             Worksheet wsDCS = inWB.Worksheets.Add();
-            classIOSInterface wsInt;
-            classMap wsMap;
-            string textNode;
+            int xlRow = 0;
+
             string intCUSTID;
             string intCID;
             string intLDEV;
@@ -308,42 +237,29 @@ namespace Site_Manager
             wsDCS.Cells[2, 12].Value = "T3 ID";
             wsDCS.Rows[2].Font.Bold = true;
 
-            for (int n = 0; n < inNode.Nodes.Count; n++)
+            foreach (TreeNode N in inNode.Nodes)
             {
-                textNode = inNode.Nodes[n].Text;
-                wsInt = (classIOSInterface)inNode.Nodes[n].Tag;
+                string tagNode = (string)N.Tag;
+                string tagCID = tagNode.Split("*".ToCharArray())[0];
+                string tagUID = tagNode.Substring(tagNode.IndexOf("*")+1);
+                classCircuit CX = dbSite.WB[tagCID];
+                intCID = CX.ID;
+                intCUSTID = CX.Customer;
+                intLINT = CX.Interface;
 
-                intCUSTID = textNode.Split(";".ToCharArray())[0].Trim();
-                intCID = textNode.Split(";".ToCharArray())[1].Trim();
-                intLDEV = textNode.Split(";".ToCharArray())[2].Trim();
-                intLINT = wsInt.ID;
+                //classMap M = dbSite.Maps[dbSite.WB.Units[dbSite.WB[intCID].Unit].Circuit];
+                classMap M = dbSite.Maps[tagUID];
+                intLDEV = M.Legacy;
+                intADEV = M.ASR;
+                intAINT = intLINT.Replace(M.PrefixLegacy, M.PrefixASR);
 
-                wsMap = getMap(intLDEV, wsInt.Unit);
-
-
-                // USE THESE WITH NO PROCDS //
-                intADEV = wsMap.ASR.ToUpper();
-                intAINT = wsInt.ID.Replace(wsInt.Unit, wsMap.PrefixASR);
-
-
-                // USE THESE WITH PROCDS //
-                //if (wsInt.Diversity == true || wsInt.SubChannel != null)
-                //{
-                //    intADEV = wsMap.ASR.ToUpper();
-                //    intAINT = wsInt.ID.Replace(wsInt.Unit, wsMap.PrefixASR);
-                //}
-                //else
-                //{
-                //    intADEV = null;
-                //    intAINT = null;
-                //}
-
-                wsDCS.Cells[n + 3, 1].Value = intCUSTID;
-                wsDCS.Cells[n + 3, 2].Value = intCID;
-                wsDCS.Cells[n + 3, 4].Value = intLDEV;
-                wsDCS.Cells[n + 3, 5].Value = intLINT;
-                wsDCS.Cells[n + 3, 7].Value = intADEV;
-                wsDCS.Cells[n + 3, 8].Value = intAINT;
+                xlRow++;
+                wsDCS.Cells[xlRow + 2, 1].Value = intCUSTID;
+                wsDCS.Cells[xlRow + 2, 2].Value = intCID;
+                wsDCS.Cells[xlRow + 2, 4].Value = intLDEV;
+                wsDCS.Cells[xlRow + 2, 5].Value = intLINT;
+                wsDCS.Cells[xlRow + 2, 7].Value = intADEV;
+                wsDCS.Cells[xlRow + 2, 8].Value = intAINT;
             }
             wsDCS.Cells.EntireColumn.HorizontalAlignment = HorizontalAlignment.Center;
             wsDCS.Cells.EntireColumn.AutoFit();
@@ -352,9 +268,8 @@ namespace Site_Manager
         private void excelMON(Workbook inWB, TreeNode inNode)
         {
             Worksheet wsMON = inWB.Worksheets.Add();
-            classIOSInterface wsInt;
-            classMap wsMap;
-            string textNode;
+            int xlRow = 0;
+
             string intCUSTID;
             string intCID;
             string intLDEV;
@@ -383,27 +298,29 @@ namespace Site_Manager
             wsMON.Cells[2, 11].Value = "Engineering Order ID";
             wsMON.Rows[2].Font.Bold = true;
 
-            for (int n = 0; n < inNode.Nodes.Count; n++)
+            foreach (TreeNode N in inNode.Nodes)
             {
-                textNode = inNode.Nodes[n].Text;
-                wsInt = (classIOSInterface)inNode.Nodes[n].Tag;
+                string tagNode = (string)N.Tag;
+                string tagCID = tagNode.Split("*".ToCharArray())[0];
+                string tagUID = tagNode.Substring(tagNode.IndexOf("*") + 1);
+                classCircuit CX = dbSite.WB[tagCID];
+                intCID = CX.ID;
+                intCUSTID = CX.Customer;
+                intLINT = CX.Interface;
 
-                intCUSTID = textNode.Split(";".ToCharArray())[0].Trim();
-                intCID = textNode.Split(";".ToCharArray())[1].Trim();
-                intLDEV = textNode.Split(";".ToCharArray())[2].Trim();
+                //classMap M = dbSite.Maps[dbSite.WB.Units[dbSite.WB[intCID].Unit].Circuit];
+                classMap M = dbSite.Maps[tagUID];
+                intLDEV = M.Legacy;
+                intADEV = M.ASR;
+                intAINT = intLINT.Replace(M.PrefixLegacy, M.PrefixASR);
 
-                wsMap = getMap(intLDEV, wsInt.Unit);
-
-                intLINT = wsInt.ID;
-                intADEV = wsMap.ASR.ToUpper();
-                intAINT = wsInt.ID.Replace(wsInt.Unit, wsMap.PrefixASR);
-
-                wsMON.Cells[n + 3, 1].Value = intCUSTID;
-                wsMON.Cells[n + 3, 2].Value = intCID;
-                wsMON.Cells[n + 3, 5].Value = intLDEV;
-                wsMON.Cells[n + 3, 6].Value = intLINT;
-                wsMON.Cells[n + 3, 8].Value = intADEV;
-                wsMON.Cells[n + 3, 9].Value = intAINT;
+                xlRow++;
+                wsMON.Cells[xlRow + 2, 1].Value = intCUSTID;
+                wsMON.Cells[xlRow + 2, 2].Value = intCID;
+                wsMON.Cells[xlRow + 2, 5].Value = intLDEV;
+                wsMON.Cells[xlRow + 2, 6].Value = intLINT;
+                wsMON.Cells[xlRow + 2, 8].Value = intADEV;
+                wsMON.Cells[xlRow + 2, 9].Value = intAINT;
             }
             wsMON.Cells.EntireColumn.HorizontalAlignment = HorizontalAlignment.Center;
             wsMON.Cells.EntireColumn.AutoFit();
@@ -412,9 +329,8 @@ namespace Site_Manager
         private void excelPHY(Workbook inWB, TreeNode inNode)
         {
             Worksheet wsPHY = inWB.Worksheets.Add();
-            classIOSInterface wsInt;
-            classMap wsMap;
-            string textNode;
+            int xlRow = 0;
+
             string intCUSTID;
             string intCID;
             string intLDEV;
@@ -442,27 +358,29 @@ namespace Site_Manager
             wsPHY.Cells[2, 10].Value = "Engineering Order ID";
             wsPHY.Rows[2].Font.Bold = true;
 
-            for (int n = 0; n < inNode.Nodes.Count; n++)
+            foreach (TreeNode N in inNode.Nodes)
             {
-                textNode = inNode.Nodes[n].Text;
-                wsInt = (classIOSInterface)inNode.Nodes[n].Tag;
+                string tagNode = (string)N.Tag;
+                string tagCID = tagNode.Split("*".ToCharArray())[0];
+                string tagUID = tagNode.Substring(tagNode.IndexOf("*") + 1);
+                classCircuit CX = dbSite.WB[tagCID];
+                intCID = CX.ID;
+                intCUSTID = CX.Customer;
+                intLINT = CX.Interface;
 
-                intCUSTID = textNode.Split(";".ToCharArray())[0].Trim();
-                intCID = textNode.Split(";".ToCharArray())[1].Trim();
-                intLDEV = textNode.Split(";".ToCharArray())[2].Trim();
+                //classMap M = dbSite.Maps[dbSite.WB.Units[dbSite.WB[intCID].Unit].Circuit];
+                classMap M = dbSite.Maps[tagUID];
+                intLDEV = M.Legacy;
+                intADEV = M.ASR;
+                intAINT = intLINT.Replace(M.PrefixLegacy, M.PrefixASR);
 
-                wsMap = getMap(intLDEV, wsInt.Unit);
-
-                intLINT = wsInt.ID;
-                intADEV = wsMap.ASR.ToUpper();
-                intAINT = wsInt.ID.Replace(wsInt.Unit, wsMap.PrefixASR);
-
-                wsPHY.Cells[n + 3, 1].Value = intCUSTID;
-                wsPHY.Cells[n + 3, 2].Value = intCID;
-                wsPHY.Cells[n + 3, 3].Value = intLDEV;
-                wsPHY.Cells[n + 3, 4].Value = intLINT;
-                wsPHY.Cells[n + 3, 8].Value = intADEV;
-                wsPHY.Cells[n + 3, 9].Value = intAINT;
+                xlRow++;
+                wsPHY.Cells[xlRow + 2, 1].Value = intCUSTID;
+                wsPHY.Cells[xlRow + 2, 2].Value = intCID;
+                wsPHY.Cells[xlRow + 2, 3].Value = intLDEV;
+                wsPHY.Cells[xlRow + 2, 4].Value = intLINT;
+                wsPHY.Cells[xlRow + 2, 8].Value = intADEV;
+                wsPHY.Cells[xlRow + 2, 9].Value = intAINT;
             }
             wsPHY.Cells.EntireColumn.HorizontalAlignment = HorizontalAlignment.Center;
             wsPHY.Cells.EntireColumn.AutoFit();

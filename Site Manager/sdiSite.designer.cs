@@ -29,8 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.treeIOX = new System.Windows.Forms.TreeView();
-            this.treeIOS = new System.Windows.Forms.TreeView();
+            this.treeASR = new System.Windows.Forms.TreeView();
             this.lblASR = new System.Windows.Forms.Label();
             this.lblLegacy = new System.Windows.Forms.Label();
             this.menuSite = new System.Windows.Forms.MenuStrip();
@@ -40,10 +39,9 @@
             this.menuFileSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFileClose = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSiteDatabase = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuSiteDevices = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuSiteDevicesAddASR = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuSiteDevicesAddLegacy = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuSiteMaps = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSiteData = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSiteDataASR = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSiteDataWB = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSiteCircuits = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSiteSchedule = new System.Windows.Forms.ToolStripMenuItem();
             this.addASRDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,52 +50,43 @@
             this.contextLegacyNodeAssignASR = new System.Windows.Forms.ToolStripMenuItem();
             this.btnAutoAssign = new System.Windows.Forms.Button();
             this.tabsMapping = new System.Windows.Forms.TabControl();
-            this.tabAssigned = new System.Windows.Forms.TabPage();
-            this.gridMaps = new System.Windows.Forms.DataGridView();
-            this.gridcolumnMType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridcolumnMLegacy = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridcolumnMLegacyPrefix = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridcolumnMASR = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridcolumnMASRPrefix = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tabUnassigned = new System.Windows.Forms.TabPage();
-            this.gridUnMaps = new System.Windows.Forms.DataGridView();
-            this.gridcolumnUType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridcolumnULegacy = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridcolumnULegacyPrefix = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabAssignedCX = new System.Windows.Forms.TabPage();
+            this.gridAssigned = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabUnassignedCX = new System.Windows.Forms.TabPage();
+            this.gridUnassigned = new System.Windows.Forms.DataGridView();
+            this.treeWB = new System.Windows.Forms.TreeView();
+            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuSite.SuspendLayout();
             this.contextLegacyNode.SuspendLayout();
             this.tabsMapping.SuspendLayout();
-            this.tabAssigned.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridMaps)).BeginInit();
-            this.tabUnassigned.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridUnMaps)).BeginInit();
+            this.tabAssignedCX.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridAssigned)).BeginInit();
+            this.tabUnassignedCX.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridUnassigned)).BeginInit();
             this.SuspendLayout();
             // 
-            // treeIOX
+            // treeASR
             // 
-            this.treeIOX.CheckBoxes = true;
-            this.treeIOX.Location = new System.Drawing.Point(394, 25);
-            this.treeIOX.MinimumSize = new System.Drawing.Size(200, 200);
-            this.treeIOX.Name = "treeIOX";
-            this.treeIOX.Size = new System.Drawing.Size(200, 200);
-            this.treeIOX.TabIndex = 0;
-            this.treeIOX.TabStop = false;
-            this.treeIOX.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeIOX_NodeMouseClick);
-            // 
-            // treeIOS
-            // 
-            this.treeIOS.AllowDrop = true;
-            this.treeIOS.Location = new System.Drawing.Point(10, 25);
-            this.treeIOS.MinimumSize = new System.Drawing.Size(200, 200);
-            this.treeIOS.Name = "treeIOS";
-            this.treeIOS.Size = new System.Drawing.Size(200, 200);
-            this.treeIOS.TabIndex = 1;
-            this.treeIOS.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeIOS_NodeMouseClick);
+            this.treeASR.CheckBoxes = true;
+            this.treeASR.Location = new System.Drawing.Point(493, 25);
+            this.treeASR.MinimumSize = new System.Drawing.Size(300, 200);
+            this.treeASR.Name = "treeASR";
+            this.treeASR.Size = new System.Drawing.Size(300, 200);
+            this.treeASR.TabIndex = 0;
+            this.treeASR.TabStop = false;
+            this.treeASR.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeASR_AfterCheck);
             // 
             // lblASR
             // 
             this.lblASR.AutoSize = true;
-            this.lblASR.Location = new System.Drawing.Point(391, 12);
+            this.lblASR.Location = new System.Drawing.Point(493, 12);
             this.lblASR.Name = "lblASR";
             this.lblASR.Size = new System.Drawing.Size(71, 13);
             this.lblASR.TabIndex = 2;
@@ -119,7 +108,7 @@
             this.menuSiteDatabase});
             this.menuSite.Location = new System.Drawing.Point(0, 0);
             this.menuSite.Name = "menuSite";
-            this.menuSite.Size = new System.Drawing.Size(606, 24);
+            this.menuSite.Size = new System.Drawing.Size(803, 24);
             this.menuSite.TabIndex = 4;
             this.menuSite.Text = "menuSite";
             this.menuSite.Visible = false;
@@ -175,8 +164,7 @@
             // menuSiteDatabase
             // 
             this.menuSiteDatabase.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuSiteDevices,
-            this.menuSiteMaps,
+            this.menuSiteData,
             this.menuSiteCircuits,
             this.menuSiteSchedule});
             this.menuSiteDatabase.MergeAction = System.Windows.Forms.MergeAction.Insert;
@@ -185,48 +173,40 @@
             this.menuSiteDatabase.Size = new System.Drawing.Size(38, 20);
             this.menuSiteDatabase.Text = "&Site";
             // 
-            // menuSiteDevices
+            // menuSiteData
             // 
-            this.menuSiteDevices.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuSiteDevicesAddASR,
-            this.menuSiteDevicesAddLegacy});
-            this.menuSiteDevices.Name = "menuSiteDevices";
-            this.menuSiteDevices.Size = new System.Drawing.Size(152, 22);
-            this.menuSiteDevices.Text = "&Devices...";
+            this.menuSiteData.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuSiteDataASR,
+            this.menuSiteDataWB});
+            this.menuSiteData.Name = "menuSiteData";
+            this.menuSiteData.Size = new System.Drawing.Size(122, 22);
+            this.menuSiteData.Text = "Data";
             // 
-            // menuSiteDevicesAddASR
+            // menuSiteDataASR
             // 
-            this.menuSiteDevicesAddASR.Name = "menuSiteDevicesAddASR";
-            this.menuSiteDevicesAddASR.Size = new System.Drawing.Size(174, 22);
-            this.menuSiteDevicesAddASR.Text = "Add &ASR Device";
-            this.menuSiteDevicesAddASR.Click += new System.EventHandler(this.menuSiteDevicesAddASR_Click);
+            this.menuSiteDataASR.Name = "menuSiteDataASR";
+            this.menuSiteDataASR.Size = new System.Drawing.Size(172, 22);
+            this.menuSiteDataASR.Text = "Add ASR Device...";
+            this.menuSiteDataASR.Click += new System.EventHandler(this.menuSiteDataASR_Click);
             // 
-            // menuSiteDevicesAddLegacy
+            // menuSiteDataWB
             // 
-            this.menuSiteDevicesAddLegacy.Name = "menuSiteDevicesAddLegacy";
-            this.menuSiteDevicesAddLegacy.Size = new System.Drawing.Size(174, 22);
-            this.menuSiteDevicesAddLegacy.Text = "Add &Legacy Device";
-            this.menuSiteDevicesAddLegacy.Click += new System.EventHandler(this.menuSiteDevicesAddLegacy_Click);
-            // 
-            // menuSiteMaps
-            // 
-            this.menuSiteMaps.Enabled = false;
-            this.menuSiteMaps.Name = "menuSiteMaps";
-            this.menuSiteMaps.Size = new System.Drawing.Size(152, 22);
-            this.menuSiteMaps.Text = "Maps";
-            this.menuSiteMaps.Click += new System.EventHandler(this.menuSiteMaps_Click);
+            this.menuSiteDataWB.Name = "menuSiteDataWB";
+            this.menuSiteDataWB.Size = new System.Drawing.Size(172, 22);
+            this.menuSiteDataWB.Text = "Add Legacy Data...";
+            this.menuSiteDataWB.Click += new System.EventHandler(this.menuSiteDataWB_Click);
             // 
             // menuSiteCircuits
             // 
             this.menuSiteCircuits.Name = "menuSiteCircuits";
-            this.menuSiteCircuits.Size = new System.Drawing.Size(152, 22);
+            this.menuSiteCircuits.Size = new System.Drawing.Size(122, 22);
             this.menuSiteCircuits.Text = "Circuits";
             this.menuSiteCircuits.Click += new System.EventHandler(this.menuSiteCircuits_Click);
             // 
             // menuSiteSchedule
             // 
             this.menuSiteSchedule.Name = "menuSiteSchedule";
-            this.menuSiteSchedule.Size = new System.Drawing.Size(152, 22);
+            this.menuSiteSchedule.Size = new System.Drawing.Size(122, 22);
             this.menuSiteSchedule.Text = "&Schedule";
             this.menuSiteSchedule.Click += new System.EventHandler(this.menuSiteSchedule_Click);
             // 
@@ -252,11 +232,10 @@
             this.contextLegacyNodeAssignASR.Name = "contextLegacyNodeAssignASR";
             this.contextLegacyNodeAssignASR.Size = new System.Drawing.Size(184, 22);
             this.contextLegacyNodeAssignASR.Text = "Assign Preferred ASR";
-            this.contextLegacyNodeAssignASR.Click += new System.EventHandler(this.contextLegacyNodeAssignASR_Click);
             // 
             // btnAutoAssign
             // 
-            this.btnAutoAssign.Location = new System.Drawing.Point(216, 50);
+            this.btnAutoAssign.Location = new System.Drawing.Point(316, 50);
             this.btnAutoAssign.Name = "btnAutoAssign";
             this.btnAutoAssign.Size = new System.Drawing.Size(172, 23);
             this.btnAutoAssign.TabIndex = 5;
@@ -266,129 +245,142 @@
             // 
             // tabsMapping
             // 
-            this.tabsMapping.Controls.Add(this.tabAssigned);
-            this.tabsMapping.Controls.Add(this.tabUnassigned);
+            this.tabsMapping.Controls.Add(this.tabAssignedCX);
+            this.tabsMapping.Controls.Add(this.tabUnassignedCX);
             this.tabsMapping.Location = new System.Drawing.Point(10, 231);
             this.tabsMapping.Name = "tabsMapping";
             this.tabsMapping.SelectedIndex = 0;
-            this.tabsMapping.Size = new System.Drawing.Size(588, 239);
+            this.tabsMapping.Size = new System.Drawing.Size(783, 239);
             this.tabsMapping.TabIndex = 6;
+            this.tabsMapping.TabStop = false;
             // 
-            // tabAssigned
+            // tabAssignedCX
             // 
-            this.tabAssigned.Controls.Add(this.gridMaps);
-            this.tabAssigned.Location = new System.Drawing.Point(4, 22);
-            this.tabAssigned.Name = "tabAssigned";
-            this.tabAssigned.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAssigned.Size = new System.Drawing.Size(580, 213);
-            this.tabAssigned.TabIndex = 0;
-            this.tabAssigned.Text = "Assigned";
-            this.tabAssigned.UseVisualStyleBackColor = true;
+            this.tabAssignedCX.Controls.Add(this.gridAssigned);
+            this.tabAssignedCX.Location = new System.Drawing.Point(4, 22);
+            this.tabAssignedCX.Name = "tabAssignedCX";
+            this.tabAssignedCX.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAssignedCX.Size = new System.Drawing.Size(775, 213);
+            this.tabAssignedCX.TabIndex = 2;
+            this.tabAssignedCX.Text = "Assigned";
+            this.tabAssignedCX.UseVisualStyleBackColor = true;
             // 
-            // gridMaps
+            // gridAssigned
             // 
-            this.gridMaps.AllowUserToAddRows = false;
-            this.gridMaps.AllowUserToDeleteRows = false;
-            this.gridMaps.AllowUserToResizeColumns = false;
-            this.gridMaps.AllowUserToResizeRows = false;
-            this.gridMaps.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridMaps.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.gridcolumnMType,
-            this.gridcolumnMLegacy,
-            this.gridcolumnMLegacyPrefix,
-            this.gridcolumnMASR,
-            this.gridcolumnMASRPrefix});
-            this.gridMaps.Location = new System.Drawing.Point(6, 6);
-            this.gridMaps.Name = "gridMaps";
-            this.gridMaps.ReadOnly = true;
-            this.gridMaps.Size = new System.Drawing.Size(568, 200);
-            this.gridMaps.TabIndex = 0;
-            this.gridMaps.TabStop = false;
+            this.gridAssigned.AllowUserToAddRows = false;
+            this.gridAssigned.AllowUserToDeleteRows = false;
+            this.gridAssigned.AllowUserToResizeRows = false;
+            this.gridAssigned.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridAssigned.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column1,
+            this.Column2,
+            this.Column3,
+            this.Column4,
+            this.Column5});
+            this.gridAssigned.Location = new System.Drawing.Point(3, 6);
+            this.gridAssigned.Name = "gridAssigned";
+            this.gridAssigned.ReadOnly = true;
+            this.gridAssigned.Size = new System.Drawing.Size(766, 201);
+            this.gridAssigned.TabIndex = 0;
+            this.gridAssigned.TabStop = false;
             // 
-            // gridcolumnMType
+            // Column1
             // 
-            this.gridcolumnMType.HeaderText = "Type";
-            this.gridcolumnMType.Name = "gridcolumnMType";
-            this.gridcolumnMType.ReadOnly = true;
+            this.Column1.HeaderText = "Type";
+            this.Column1.Name = "Column1";
+            this.Column1.ReadOnly = true;
             // 
-            // gridcolumnMLegacy
+            // Column2
             // 
-            this.gridcolumnMLegacy.HeaderText = "Legacy";
-            this.gridcolumnMLegacy.Name = "gridcolumnMLegacy";
-            this.gridcolumnMLegacy.ReadOnly = true;
+            this.Column2.HeaderText = "Legacy Device";
+            this.Column2.Name = "Column2";
+            this.Column2.ReadOnly = true;
             // 
-            // gridcolumnMLegacyPrefix
+            // Column3
             // 
-            this.gridcolumnMLegacyPrefix.HeaderText = "Legacy Prefix";
-            this.gridcolumnMLegacyPrefix.Name = "gridcolumnMLegacyPrefix";
-            this.gridcolumnMLegacyPrefix.ReadOnly = true;
+            this.Column3.HeaderText = "Legacy Prefix";
+            this.Column3.Name = "Column3";
+            this.Column3.ReadOnly = true;
             // 
-            // gridcolumnMASR
+            // Column4
             // 
-            this.gridcolumnMASR.HeaderText = "ASR";
-            this.gridcolumnMASR.Name = "gridcolumnMASR";
-            this.gridcolumnMASR.ReadOnly = true;
+            this.Column4.HeaderText = "ASR Device";
+            this.Column4.Name = "Column4";
+            this.Column4.ReadOnly = true;
             // 
-            // gridcolumnMASRPrefix
+            // Column5
             // 
-            this.gridcolumnMASRPrefix.HeaderText = "ASR Prefix";
-            this.gridcolumnMASRPrefix.Name = "gridcolumnMASRPrefix";
-            this.gridcolumnMASRPrefix.ReadOnly = true;
+            this.Column5.HeaderText = "ASR Prefix";
+            this.Column5.Name = "Column5";
+            this.Column5.ReadOnly = true;
             // 
-            // tabUnassigned
+            // tabUnassignedCX
             // 
-            this.tabUnassigned.Controls.Add(this.gridUnMaps);
-            this.tabUnassigned.Location = new System.Drawing.Point(4, 22);
-            this.tabUnassigned.Name = "tabUnassigned";
-            this.tabUnassigned.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUnassigned.Size = new System.Drawing.Size(580, 213);
-            this.tabUnassigned.TabIndex = 1;
-            this.tabUnassigned.Text = "Unassigned";
-            this.tabUnassigned.UseVisualStyleBackColor = true;
+            this.tabUnassignedCX.Controls.Add(this.gridUnassigned);
+            this.tabUnassignedCX.Location = new System.Drawing.Point(4, 22);
+            this.tabUnassignedCX.Name = "tabUnassignedCX";
+            this.tabUnassignedCX.Padding = new System.Windows.Forms.Padding(3);
+            this.tabUnassignedCX.Size = new System.Drawing.Size(775, 213);
+            this.tabUnassignedCX.TabIndex = 3;
+            this.tabUnassignedCX.Text = "Unassigned";
+            this.tabUnassignedCX.UseVisualStyleBackColor = true;
             // 
-            // gridUnMaps
+            // gridUnassigned
             // 
-            this.gridUnMaps.AllowUserToAddRows = false;
-            this.gridUnMaps.AllowUserToDeleteRows = false;
-            this.gridUnMaps.AllowUserToResizeColumns = false;
-            this.gridUnMaps.AllowUserToResizeRows = false;
-            this.gridUnMaps.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridUnMaps.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.gridcolumnUType,
-            this.gridcolumnULegacy,
-            this.gridcolumnULegacyPrefix});
-            this.gridUnMaps.Location = new System.Drawing.Point(6, 6);
-            this.gridUnMaps.Name = "gridUnMaps";
-            this.gridUnMaps.Size = new System.Drawing.Size(568, 200);
-            this.gridUnMaps.TabIndex = 0;
+            this.gridUnassigned.AllowUserToAddRows = false;
+            this.gridUnassigned.AllowUserToDeleteRows = false;
+            this.gridUnassigned.AllowUserToResizeRows = false;
+            this.gridUnassigned.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridUnassigned.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column6,
+            this.Column7,
+            this.Column8});
+            this.gridUnassigned.Location = new System.Drawing.Point(3, 6);
+            this.gridUnassigned.Name = "gridUnassigned";
+            this.gridUnassigned.ReadOnly = true;
+            this.gridUnassigned.Size = new System.Drawing.Size(766, 201);
+            this.gridUnassigned.TabIndex = 0;
+            this.gridUnassigned.TabStop = false;
             // 
-            // gridcolumnUType
+            // treeWB
             // 
-            this.gridcolumnUType.HeaderText = "Type";
-            this.gridcolumnUType.Name = "gridcolumnUType";
+            this.treeWB.AllowDrop = true;
+            this.treeWB.Location = new System.Drawing.Point(10, 25);
+            this.treeWB.MinimumSize = new System.Drawing.Size(300, 200);
+            this.treeWB.Name = "treeWB";
+            this.treeWB.Size = new System.Drawing.Size(300, 200);
+            this.treeWB.TabIndex = 7;
             // 
-            // gridcolumnULegacy
+            // Column6
             // 
-            this.gridcolumnULegacy.HeaderText = "Legacy";
-            this.gridcolumnULegacy.Name = "gridcolumnULegacy";
+            this.Column6.HeaderText = "Type";
+            this.Column6.Name = "Column6";
+            this.Column6.ReadOnly = true;
             // 
-            // gridcolumnULegacyPrefix
+            // Column7
             // 
-            this.gridcolumnULegacyPrefix.HeaderText = "Legacy Prefix";
-            this.gridcolumnULegacyPrefix.Name = "gridcolumnULegacyPrefix";
+            this.Column7.HeaderText = "Legacy Device";
+            this.Column7.Name = "Column7";
+            this.Column7.ReadOnly = true;
+            // 
+            // Column8
+            // 
+            this.Column8.HeaderText = "Legacy Prefix";
+            this.Column8.Name = "Column8";
+            this.Column8.ReadOnly = true;
             // 
             // sdiSite
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(606, 479);
+            this.ClientSize = new System.Drawing.Size(803, 479);
+            this.Controls.Add(this.treeWB);
             this.Controls.Add(this.tabsMapping);
             this.Controls.Add(this.btnAutoAssign);
             this.Controls.Add(this.lblLegacy);
             this.Controls.Add(this.lblASR);
-            this.Controls.Add(this.treeIOS);
-            this.Controls.Add(this.treeIOX);
+            this.Controls.Add(this.treeASR);
             this.Controls.Add(this.menuSite);
             this.MinimumSize = new System.Drawing.Size(415, 200);
             this.Name = "sdiSite";
@@ -399,10 +391,10 @@
             this.menuSite.PerformLayout();
             this.contextLegacyNode.ResumeLayout(false);
             this.tabsMapping.ResumeLayout(false);
-            this.tabAssigned.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gridMaps)).EndInit();
-            this.tabUnassigned.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gridUnMaps)).EndInit();
+            this.tabAssignedCX.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridAssigned)).EndInit();
+            this.tabUnassignedCX.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridUnassigned)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -410,8 +402,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TreeView treeIOX;
-        private System.Windows.Forms.TreeView treeIOS;
+        private System.Windows.Forms.TreeView treeASR;
         private System.Windows.Forms.Label lblASR;
         private System.Windows.Forms.Label lblLegacy;
         private System.Windows.Forms.MenuStrip menuSite;
@@ -421,29 +412,29 @@
         private System.Windows.Forms.ToolStripMenuItem menuFileSave;
         private System.Windows.Forms.ToolStripMenuItem menuFileSaveAs;
         private System.Windows.Forms.ToolStripSeparator menuSiteFileSeparator;
-        private System.Windows.Forms.ToolStripMenuItem menuSiteDevices;
         private System.Windows.Forms.ToolStripMenuItem addASRDeviceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addLegacyDeviceToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem menuSiteDevicesAddASR;
-        private System.Windows.Forms.ToolStripMenuItem menuSiteDevicesAddLegacy;
-        private System.Windows.Forms.ToolStripMenuItem menuSiteMaps;
         private System.Windows.Forms.ContextMenuStrip contextLegacyNode;
         private System.Windows.Forms.ToolStripMenuItem contextLegacyNodeAssignASR;
         private System.Windows.Forms.ToolStripMenuItem menuSiteCircuits;
         private System.Windows.Forms.ToolStripMenuItem menuSiteSchedule;
         private System.Windows.Forms.Button btnAutoAssign;
         private System.Windows.Forms.TabControl tabsMapping;
-        private System.Windows.Forms.TabPage tabAssigned;
-        private System.Windows.Forms.DataGridView gridMaps;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnMType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnMLegacy;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnMLegacyPrefix;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnMASR;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnMASRPrefix;
-        private System.Windows.Forms.TabPage tabUnassigned;
-        private System.Windows.Forms.DataGridView gridUnMaps;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnUType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnULegacy;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gridcolumnULegacyPrefix;
+        private System.Windows.Forms.TabPage tabAssignedCX;
+        private System.Windows.Forms.TabPage tabUnassignedCX;
+        private System.Windows.Forms.TreeView treeWB;
+        private System.Windows.Forms.ToolStripMenuItem menuSiteData;
+        private System.Windows.Forms.ToolStripMenuItem menuSiteDataASR;
+        private System.Windows.Forms.ToolStripMenuItem menuSiteDataWB;
+        private System.Windows.Forms.DataGridView gridAssigned;
+        private System.Windows.Forms.DataGridView gridUnassigned;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
     }
 }

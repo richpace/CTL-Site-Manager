@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Cisco Device.dll" size="10240">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Cisco Device.dll" size="10752">
       <assemblyIdentity name="Cisco Device" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>3bcQ/B+599V2+29Hajiil8fss/AEmsJAIAL5KoPLitE=</dsig:DigestValue>
+        <dsig:DigestValue>bsfEJtbnnD0tM3mnbYIdynx/ugTJz7oHcNlLdQjjNtc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -61,19 +61,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>odAIKcpqUaXmP6R5QmUKf6RSGF6xY9oJsace2Stmox0=</dsig:DigestValue>
+        <dsig:DigestValue>FXCBOWz/OGzgxiEzBSEub9pVd8wM9veDXVQ38RmFyrc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Site Manager.exe" size="111528">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Site Manager.exe" size="89512">
       <assemblyIdentity name="Site Manager" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>RVTk8h2Dk9ESghiB2iD9QicjG4q3UsjDCsODwLFYP3A=</dsig:DigestValue>
+        <dsig:DigestValue>fWyF+b7HX9TEWLY4E4POTPxrOvtkUEKj8AQ4clmby4Q=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

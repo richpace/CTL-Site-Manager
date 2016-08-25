@@ -15,14 +15,9 @@ namespace Site_Manager
     public partial class sdiSite : Form
     {
         // FIELDS //
-        private classSiteDatabase dbSite = new classSiteDatabase();
+        private classSiteDB dbSite = new classSiteDB();
 
         // CONSTRUCTORS //
-        public sdiSite()
-        {
-            InitializeComponent();
-        }
-
         public sdiSite(int inID)
         {
             InitializeComponent();
@@ -32,12 +27,9 @@ namespace Site_Manager
         }
 
         // PROPERTIES //
-        public new classSiteDatabase Site
+        public new classSiteDB Site
         {
-            get
-            {
-                return dbSite;
-            }
+            get { return dbSite; }
         }
 
         // METHODS //
@@ -69,21 +61,22 @@ namespace Site_Manager
             Close();
         }
 
-        private void menuSiteDevicesAddASR_Click(object sender, EventArgs e)
+        private void menuSiteDataASR_Click(object sender, EventArgs e)
         {
-            Site.AddIOXDevice();
+            Site.AddASR();
+            //string newASR = Site.AddASR();
+
+            //Site.ASR.UpdateUnits(newASR, Site.WB.Units, true);
+            //Site.WB.DeleteASR(newASR);
+
             arrangeWindow();
         }
 
-        private void menuSiteDevicesAddLegacy_Click(object sender, EventArgs e)
+        private void menuSiteDataWB_Click(object sender, EventArgs e)
         {
-            Site.AddIOSDevice();
-            arrangeWindow();
-        }
+            Site.AddWBData();
 
-        private void menuSiteMaps_Click(object sender, EventArgs e)
-        {
-            sdiSiteMaps2 windowMaps = new sdiSiteMaps2(Site);
+            arrangeWindow();
         }
 
         private void menuSiteCircuits_Click(object sender, EventArgs e)
@@ -99,31 +92,9 @@ namespace Site_Manager
         // EVENTS: GENERAL //
         private void btnAutoAssign_Click(object sender, EventArgs e)
         {
-            //dbSite.Mapped = true;
-            dbSite.MapUnits(treeIOS.Nodes, treeIOX.Nodes);
-            processWindow();
-        }
+            dbSite.MapUnits(treeWB.Nodes, treeASR.Nodes);
 
-        private void contextLegacyNodeAssignASR_Click(object sender, EventArgs e)
-        {
-            sdiASRSelect iosSelectASR = new sdiASRSelect(dbSite.ASR);
-            classIOS iosDevice = dbSite.Legacy[this.contextLegacyNode.Tag.ToString()];
-
-            if ((string)iosSelectASR.Tag != "CANX")
-            {
-                if (iosDevice.PreferredASR != null)
-                {
-                    dbSite.ASR[iosDevice.PreferredASR].Assigned = false;
-                }
-
-                iosDevice.AssignASR(iosSelectASR.ASR);
-
-                if (iosSelectASR.ASR != null)
-                {
-                    dbSite.ASR[iosSelectASR.ASR].Assigned = true;
-                }
-                processWindow();
-            }
+            loadGrids();
         }
 
         private void sdiSite_Resize(object sender, EventArgs e)
@@ -131,81 +102,52 @@ namespace Site_Manager
             arrangeWindow();
         }
 
-        private void treeIOS_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        private void treeASR_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            string nodeName = getDeviceName(e.Node.FullPath);
+            string uid;
 
-            if (e.Button == MouseButtons.Right && dbSite.Mapped == false)
+            if (e.Action != TreeViewAction.Unknown)
             {
-                int X = Cursor.Position.X;
-                int Y = Cursor.Position.Y;
-
-                contextLegacyNode.Tag = nodeName;
-                contextLegacyNode.Show(X, Y);
-            }
-        }
-
-        private void treeIOX_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            string nodeName = getDeviceName(e.Node.FullPath);
-
-            switch (e.Node.Level)
-            {
-                case 2:
-                    if ((e.Node.Nodes.Count > 0)&&(e.Node.Tag != "UNIT"))
-                    {
-                        foreach (TreeNode n in e.Node.Nodes)
+                switch (e.Node.Level)
+                {
+                    case 2:
+                        if ((string)e.Node.Tag == "OC12")
                         {
-                            n.Checked = e.Node.Checked;
-
-                            dbSite.ASR[nodeName].Units[n.Text].Assignable = n.Checked;
-                            if (n.Checked == false) updateMaps(nodeName, n.Text);
+                            foreach (TreeNode N in e.Node.Nodes)
+                            {
+                                N.Checked = e.Node.Checked;
+                                uid = parseNodePath(N.FullPath);
+                                Site.UpdateASRUnit(uid, N.Checked);
+                            }
                         }
-                    }
-                    else
-                    {
-                        dbSite.ASR[nodeName].Units[e.Node.Text].Assignable = e.Node.Checked;
-                        if (e.Node.Checked == false) updateMaps(nodeName, e.Node.Text);
-                    }
-                    break;
-                case 3:
-                    e.Node.Parent.Checked = false;
-                    foreach (TreeNode n in e.Node.Parent.Nodes)
-                    {
-                        e.Node.Parent.Checked = e.Node.Parent.Checked || n.Checked;
-                        dbSite.ASR[nodeName].Units[n.Text].Assignable = n.Checked;
-                        if (n.Checked == false) updateMaps(nodeName,n.Text);
-                    }
-
-
-                    break;
-                default:
-                    e.Node.Checked = false;
-                    break;
+                        else
+                        {
+                            if (e.Node.Nodes.Count > 0)
+                            {
+                                foreach (TreeNode N in e.Node.Nodes)
+                                {
+                                    N.Checked = e.Node.Checked;
+                                    uid = parseNodePath(N.FullPath);
+                                    Site.UpdateASRUnit(uid, N.Checked);
+                                }
+                            }
+                        }
+                        break;
+                    case 3:
+                        e.Node.Parent.Checked = false;
+                        foreach (TreeNode N in e.Node.Parent.Nodes)
+                        {
+                            e.Node.Parent.Checked = e.Node.Parent.Checked || N.Checked;
+                        }
+                        uid = parseNodePath(e.Node.FullPath);
+                        Site.UpdateASRUnit(uid, e.Node.Checked);
+                        break;
+                    default:
+                        e.Node.Checked = false;
+                        break;
+                }
+                loadGrids();
             }
-            processWindow();
-        }
-
-        private void updateMaps(string inASR, string inPrefix)
-        {
-            classSiteMapDB maps = dbSite.Maps;
-
-            int mapIndex = maps.ASRIndex(inASR, inPrefix);
-
-            if (mapIndex > -1)
-            {
-                classMap map = maps[mapIndex];
-
-                classUnit ASRUnit = dbSite.ASR[map.ASR].Units[map.PrefixASR];
-                classUnit LegacyUnit = dbSite.Legacy[map.Legacy].Units[map.PrefixLegacy];
-
-                ASRUnit.Assigned = false;
-                LegacyUnit.Assigned = false;
-
-                maps.RemoveAt(mapIndex);
-            }
-
-
         }
 
         // SUPPORT LOGIC //
@@ -214,45 +156,7 @@ namespace Site_Manager
             displaySiteName();
             displayTree();
 
-            processWindow();
-        }
-
-        private void processWindow()
-        {
-            //dbSite.Assigned = devicesAssigned();
-
-            //btnAutoAssign.Enabled = devicesAssignable() && dbSite.Assigned && !dbSite.Mapped;
-
-            //menuSiteDevicesAddASR.Enabled = !dbSite.Mapped;
-            //menuSiteDevicesAddLegacy.Enabled = !dbSite.Mapped;
-            //menuSiteCircuits.Enabled = dbSite.Mapped;
-            //menuSiteMaps.Enabled = true;
-            //menuSiteMaps.Enabled = dbSite.Mapped;
-            //menuSiteSchedule.Enabled = dbSite.Mapped;
-
-            processTreeLegacy();
-            processTreeASR();
-
             loadGrids();
-        }
-
-        private bool devicesAssigned()
-        {
-            for (int d = 0; d < dbSite.Legacy.Count; d++)
-            {
-                if (dbSite.Legacy[d].PreferredASR == null) return false;
-            }
-
-            return true;
-        }
-
-        private bool devicesAssignable()
-        {
-            if (dbSite.Legacy.Count > 0 && dbSite.Legacy.Count == dbSite.ASR.Count)
-            {
-                return true;
-            }
-            return false;
         }
 
         private void displaySiteName()
@@ -265,189 +169,296 @@ namespace Site_Manager
             {
                 this.Text = dbSite.Name;
             }
-
-            //if (dbSite.Assigned == false)
-            //{
-            //    this.Text += " DEVICES UNASSIGNED";
-            //}
-            //else
-            //{
-            //    if (dbSite.Mapped == false)
-            //    {
-            //        this.Text += " CIRCUITS UNMAPPED";
-            //    }
-            //}
         }
 
         private void displayTree()
         {
-            displayTreeLegacy();
+            displayTreeWB();
             displayTreeASR();
         }
 
-        private void displayTreeLegacy()
+        private void displayTreeWB()
         {
-            treeIOS.Nodes.Clear();
-            for (int i = 0; i < dbSite.Legacy.Count; i++)
-            {
-                treeIOS.Nodes.Add(nodeIOS(dbSite.Legacy[i]));
-            }
-            treeIOS.Sort();
+            treeWB.Nodes.Clear();
+
+            foreach (KeyValuePair<string, classCircuit> CX in dbSite.WB)
+                processWBEntry(CX.Value);
+
+            treeWB.Sort();
         }
 
-        private void displayTreeASR()
+        private void processWBEntry(classCircuit inCX)
         {
-            treeIOX.Nodes.Clear();
-            for (int i = 0; i < dbSite.ASR.Count; i++)
-            {
-                treeIOX.Nodes.Add(nodeIOX(dbSite.ASR[i]));
-            }
-            treeIOX.Sort();
-        }
+            // OMG, what a f***ing mess...I need to clean this s**t up
 
-        private void processTreeLegacy()
-        {
-            foreach (TreeNode N in treeIOS.Nodes)
-            {
-                processLegacyNodes(N);
-            }
-        }
+            TreeNode nodeDevice;
+            TreeNode nodeUnit;
+            TreeNode nodeUnitType;
+            TreeNode nodeSTS;
 
-        private void processLegacyNodes(TreeNode inNode)
-        {
-            switch (inNode.Level)
+            // DEVICE
+            if (treeWB.Nodes.ContainsKey(inCX.Device) == false)
             {
-                case 0:
-                    if (dbSite.Legacy[inNode.Text].PreferredASR == null) inNode.ForeColor = Color.Red;
-                    else inNode.ForeColor = Color.Black;
-                    break;
-                case 1:
-                    if (inNode.Text.Contains("Preferred ASR:"))
-                    {
-                        if (dbSite.Legacy[inNode.Parent.Text].PreferredASR != null)
-                        {
-                            inNode.ForeColor = Color.Black;
-                            inNode.Text = "Preferred ASR: " + dbSite.Legacy[inNode.Parent.Text].PreferredASR;
-                        }
-                        else
-                        {
-                            inNode.ForeColor = Color.Red;
-                            inNode.Text = "Preferred ASR: NONE";
-                        }
-                    }
-                    break;
-                case 2:
-                    if (dbSite.Legacy[inNode.Parent.Parent.Text].Units[inNode.Text].Assigned == true)
-                    {
-                        inNode.ForeColor = Color.Black;
-                    }
-                    else
-                    {
-                        inNode.ForeColor = Color.Red;
-                    }
-                    break;
-            }
-            foreach (TreeNode N in inNode.Nodes)
-            {
-                processLegacyNodes(N);
-            }
-        }
-
-        private void processTreeASR()
-        {
-            foreach (TreeNode N in treeIOX.Nodes)
-            {
-                processASRNodes(N);
-            }
-        }
-
-        private void processASRNodes(TreeNode inNode)
-        {
-            switch (inNode.Level)
-            {
-                case 0:
-                    if (dbSite.ASR[inNode.Text].Assigned == false) inNode.ForeColor = Color.LightGreen;
-                    else inNode.ForeColor = Color.Black;
-                    break;
-
-            }
-            foreach (TreeNode N in inNode.Nodes)
-            {
-                processASRNodes(N);
-            }
-        }
-
-        private string getDeviceName(string inPath)
-        {
-            return inPath.Split("\\".ToCharArray())[0];
-        }
-
-        private TreeNode nodeIOX(classIOX inDevice)
-        {
-            TreeNode nodeDevice = new TreeNode(inDevice.Hostname);
-            if (inDevice.Assigned == false)
-            {
-                nodeDevice.ForeColor = Color.LightGreen;
+                treeWB.Nodes.Add(inCX.Device, inCX.Device);
+                nodeDevice = treeWB.Nodes[inCX.Device];
+                nodeDevice.Nodes.Add("PHY", "GE: 0");
+                nodeDevice.Nodes.Add("MON", "MON: 0");
+                nodeDevice.Nodes.Add("DCS", "DCS: 0");
             }
             else
             {
-                nodeDevice.ForeColor = Color.Black;
+                nodeDevice = treeWB.Nodes[inCX.Device];
             }
 
-            TreeNode nodeGE = nodeIOXUnitsGE(inDevice);
-            TreeNode nodeCH = nodeIOXUnitsCH(inDevice);
-            TreeNode nodeCL = nodeIOXUnitsCL(inDevice);
+            // UNIT
 
-            if (nodeGE.Nodes.Count > 0) nodeDevice.Nodes.Add(nodeGE);
-            if (nodeCH.Nodes.Count > 0) nodeDevice.Nodes.Add(nodeCH);
-            if (nodeCL.Nodes.Count > 0) nodeDevice.Nodes.Add(nodeCL);
+            switch (inCX.Type)
+            {
+                case typeCircuit.Ethernet:
+                    nodeUnit = nodeDevice.Nodes["PHY"];
+                    if (inCX.Subinterface == true)
+                    {
+                        if (nodeUnit.Nodes.ContainsKey(inCX.Physical) == false)
+                        {
+                            nodeUnit.Nodes.Add(inCX.Physical, inCX.Physical);
+                            TreeNode nodePhysical = nodeUnit.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                        else
+                        {
+                            TreeNode nodePhysical = nodeUnit.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+                    else
+                    {
+                        if (nodeUnit.Nodes.ContainsKey(inCX.Interface) == false)
+                        {
+                            nodeUnit.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+                    nodeUnit.Text = "GE: " + nodeUnit.Nodes.Count.ToString().Trim();
+                    break;
 
-            //nodeDevice.Tag = nodeDevice.IsExpanded;
+                case typeCircuit.xSTS:
+                    nodeUnit = nodeDevice.Nodes["MON"];
+                    if (inCX.Subinterface == true)
+                    {
+                        if (nodeUnit.Nodes.ContainsKey(inCX.Physical) == false)
+                        {
+                            nodeUnit.Nodes.Add(inCX.Physical, inCX.Physical);
+                            TreeNode nodePhysical = nodeUnit.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                        else
+                        {
+                            TreeNode nodePhysical = nodeUnit.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+                    else
+                    {
+                        if (nodeUnit.Nodes.ContainsKey(inCX.Interface) == false)
+                        {
+                            nodeUnit.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+                    nodeUnit.Text = "MON: " + nodeUnit.Nodes.Count.ToString().Trim();
+                    break;
 
-            return nodeDevice;
+                case typeCircuit.xDS1:
+                    nodeUnit = nodeDevice.Nodes["DCS"];
+
+                    switch (inCX.PhysicalType)
+                    {
+                        case typePhysical.T3:
+                            if (nodeUnit.Nodes.ContainsKey("T3") == false)
+                            {
+                                nodeUnit.Nodes.Add("T3", "T3");
+                            }
+                            nodeUnitType = nodeUnit.Nodes["T3"];
+                            break;
+                        case typePhysical.SONET:
+                            if (nodeUnit.Nodes.ContainsKey("SONET") == false)
+                            {
+                                nodeUnit.Nodes.Add("SONET", "SONET");
+                            }
+                            nodeUnitType = nodeUnit.Nodes["SONET"];
+                            break;
+                        default:
+                            nodeUnitType = null;
+                            break;
+                    }
+
+                    if (nodeUnitType.Nodes.ContainsKey(inCX.STS) == false)
+                    {
+                        nodeUnitType.Nodes.Add(inCX.STS, inCX.STS);
+                    }
+                    nodeSTS = nodeUnitType.Nodes[inCX.STS];
+
+                    if (inCX.Subinterface == true)
+                    {
+                        if (nodeSTS.Nodes.ContainsKey(inCX.Physical) == false)
+                        {
+                            nodeSTS.Nodes.Add(inCX.Physical, inCX.Physical);
+                            TreeNode nodePhysical = nodeSTS.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                        else
+                        {
+                            TreeNode nodePhysical = nodeSTS.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+                    else
+                    {
+                        if (nodeSTS.Nodes.ContainsKey(inCX.Interface) == false)
+                        {
+                            nodeSTS.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+
+                    nodeUnit.Text = "DCS: " + nodeUnit.Nodes.Count.ToString().Trim();
+                    break;
+
+
+                case typeCircuit.xDS0:
+                    nodeUnit = nodeDevice.Nodes["DCS"];
+                    TreeNode nodeDS1;
+
+                    switch (inCX.PhysicalType)
+                    {
+                        case typePhysical.T3:
+                            if (nodeUnit.Nodes.ContainsKey("T3") == false)
+                            {
+                                nodeUnit.Nodes.Add("T3", "T3");
+                            }
+                            nodeUnitType = nodeUnit.Nodes["T3"];
+                            break;
+                        case typePhysical.SONET:
+                            if (nodeUnit.Nodes.ContainsKey("SONET") == false)
+                            {
+                                nodeUnit.Nodes.Add("SONET", "SONET");
+                            }
+                            nodeUnitType = nodeUnit.Nodes["SONET"];
+                            break;
+                        default:
+                            nodeUnitType = null;
+                            break;
+                    }
+
+
+                    if (nodeUnitType.Nodes.ContainsKey(inCX.STS) == false)
+                    {
+                        nodeUnitType.Nodes.Add(inCX.STS, inCX.STS);
+                    }
+                    nodeSTS = nodeUnitType.Nodes[inCX.STS];
+
+                    if (nodeSTS.Nodes.ContainsKey(inCX.DS1) == false)
+                    {
+                        nodeSTS.Nodes.Add(inCX.DS1, inCX.DS1);
+                    }
+                    nodeDS1 = nodeSTS.Nodes[inCX.DS1];
+
+                    if (inCX.Subinterface == true)
+                    {
+                        if (nodeDS1.Nodes.ContainsKey(inCX.Physical) == false)
+                        {
+                            nodeDS1.Nodes.Add(inCX.Physical, inCX.Physical);
+                            TreeNode nodePhysical = nodeDS1.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                        else
+                        {
+                            TreeNode nodePhysical = nodeDS1.Nodes[inCX.Physical];
+                            nodePhysical.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+                    else
+                    {
+                        if (nodeDS1.Nodes.ContainsKey(inCX.Interface) == false)
+                        {
+                            nodeDS1.Nodes.Add(inCX.Interface, inCX.Interface + ": " + inCX.Customer);
+                        }
+                    }
+
+                    nodeUnit.Text = "DCS: " + nodeUnit.Nodes.Count.ToString().Trim();
+                    break;
+            }
+
+
+        } //processWBEntry
+
+        private void displayTreeASR()
+        {
+            treeASR.Nodes.Clear();
+
+            foreach (KeyValuePair<string, classASR> ASR in dbSite.ASR)
+            {
+                treeASR.Nodes.Add(ASR.Key, ASR.Key);
+                TreeNode nodeASR = treeASR.Nodes[ASR.Key];
+
+                if (ASR.Value.GE == true)
+                {
+                    TreeNode nodeGE = nodeIOXUnitsGE(dbSite.ASR[ASR.Key]);
+                    nodeASR.Nodes.Add(nodeGE);
+                }
+
+                if (ASR.Value.MON == true)
+                {
+                    TreeNode nodeCL = nodeIOXUnitsCL(dbSite.ASR[ASR.Key]);
+                    nodeASR.Nodes.Add(nodeCL);
+                }
+
+                if (ASR.Value.DCS == true)
+                {
+                    TreeNode nodeCH = nodeIOXUnitsCH(dbSite.ASR[ASR.Key]);
+                    nodeASR.Nodes.Add(nodeCH);
+                }
+            }
+
+            treeASR.Sort();
         }
 
-        private TreeNode nodeIOXUnitsGE(classIOX inDevice)
+        private TreeNode nodeIOXUnitsGE(classASR inDevice)
         {
             TreeNode nodeUnitsGE = new TreeNode("GE:");
 
-            foreach (classUnit u in inDevice.Units)
-            {
-                if (u.Type2 == UnitType.GE)
+            foreach (KeyValuePair<string, classUnit> U in Site.ASR.Units)
+                if (U.Value.Type == UnitType.GE && U.Value.Assigned == false)
                 {
-                    TreeNode ge = new TreeNode(u.Prefix);
-                    ge.Checked = u.Assignable;
+                    TreeNode ge = new TreeNode(U.Value.Prefix);
+                    ge.Checked = U.Value.Assignable;
                     ge.Tag = "UNIT";
                     nodeUnitsGE.Nodes.Add(ge);
                 }
-            }
             nodeUnitsGE.Tag = "GE";
 
             return nodeUnitsGE;
         }
 
-        private TreeNode nodeIOXUnitsCH(classIOX inDevice)
+        private TreeNode nodeIOXUnitsCH(classASR inDevice)
         {
             TreeNode nodeUnitsCH = new TreeNode("OC-12:");
             TreeNode nodeUnitsOC12;
 
-            foreach (classUnit u in inDevice.Units)
+            foreach (KeyValuePair<string, classUnit> U in Site.ASR.Units)
             {
-                if (u.Type2 == UnitType.CH)
+                if (U.Value.Device == inDevice.Name && U.Value.Type == UnitType.DCS && U.Value.Assigned == false)
                 {
-                    TreeNode ch = new TreeNode(u.Prefix);
-                    ch.Checked = u.Assignable;
+                    TreeNode ch = new TreeNode(U.Value.Prefix);
+                    ch.Checked = U.Value.Assignable;
 
-                    if (nodeUnitsCH.Nodes.ContainsKey(u.Port) == false)
+                    if (nodeUnitsCH.Nodes.ContainsKey(U.Value.Port) == false)
                     {
-                        nodeUnitsOC12 = new TreeNode(u.Port);
-                        nodeUnitsOC12.Name = u.Port;
+                        nodeUnitsOC12 = new TreeNode(U.Value.Port);
+                        nodeUnitsOC12.Name = U.Value.Port;
                         nodeUnitsOC12.Tag = "OC12";
                         nodeUnitsCH.Nodes.Add(nodeUnitsOC12);
                     }
                     else
                     {
-                        nodeUnitsOC12 = nodeUnitsCH.Nodes[u.Port];
+                        nodeUnitsOC12 = nodeUnitsCH.Nodes[U.Value.Port];
                     }
                     ch.Tag = "UNIT";
                     nodeUnitsOC12.Nodes.Add(ch);
@@ -459,28 +470,28 @@ namespace Site_Manager
             return nodeUnitsCH;
         }
 
-        private TreeNode nodeIOXUnitsCL(classIOX inDevice)
+        private TreeNode nodeIOXUnitsCL(classASR inDevice)
         {
             TreeNode nodeUnitsCL = new TreeNode("OC-48:");
             TreeNode nodeUnitsOC48;
 
-            foreach (classUnit u in inDevice.Units)
+            foreach (KeyValuePair<string, classUnit> U in Site.ASR.Units)
             {
-                if (u.Type2 == UnitType.CL)
+                if (U.Value.Device == inDevice.Name && U.Value.Type == UnitType.MON && U.Value.Assigned == false)
                 {
-                    TreeNode cl = new TreeNode(u.Prefix);
-                    cl.Checked = u.Assignable;
+                    TreeNode cl = new TreeNode(U.Value.Prefix);
+                    cl.Checked = U.Value.Assignable;
 
-                    if (nodeUnitsCL.Nodes.ContainsKey(u.Port) == false)
+                    if (nodeUnitsCL.Nodes.ContainsKey(U.Value.Port) == false)
                     {
-                        nodeUnitsOC48 = new TreeNode(u.Port);
-                        nodeUnitsOC48.Name = u.Port;
+                        nodeUnitsOC48 = new TreeNode(U.Value.Port);
+                        nodeUnitsOC48.Name = U.Value.Port;
                         nodeUnitsOC48.Tag = "OC48";
                         nodeUnitsCL.Nodes.Add(nodeUnitsOC48);
                     }
                     else
                     {
-                        nodeUnitsOC48 = nodeUnitsCL.Nodes[u.Port];
+                        nodeUnitsOC48 = nodeUnitsCL.Nodes[U.Value.Port];
                     }
                     cl.Tag = "UNIT";
                     nodeUnitsOC48.Nodes.Add(cl);
@@ -492,187 +503,61 @@ namespace Site_Manager
             return nodeUnitsCL;
         }
 
-        private TreeNode nodeIOS(classIOS inDevice)
-        {
-            TreeNode nodeDevice = new TreeNode(inDevice.Hostname);
-
-            if (inDevice.PreferredASR == null)
-            {
-                nodeDevice.ForeColor = Color.Red;
-            }
-            else
-            {
-                nodeDevice.ForeColor = Color.Black;
-            }
-
-            TreeNode nodeGE = nodeIOSUnitsGE(inDevice);
-            TreeNode nodeCH = nodeIOSUnitsCH(inDevice);
-            TreeNode nodeCL = nodeIOSUnitsCL(inDevice);
-
-            nodeDevice.Nodes.Add(nodeIOSPreferredASR(inDevice.PreferredASR));
-            if (nodeGE.Nodes.Count > 0) nodeDevice.Nodes.Add(nodeGE);
-            if (nodeCH.Nodes.Count > 0) nodeDevice.Nodes.Add(nodeCH);
-            if (nodeCL.Nodes.Count > 0) nodeDevice.Nodes.Add(nodeCL);
-
-            //nodeDevice.Tag = nodeDevice.IsExpanded;
-
-            return nodeDevice;
-        }
-
-        private TreeNode nodeIOSPreferredASR(string inASR)
-        {
-            TreeNode nodeASR = new TreeNode();
-
-            if (inASR == null)
-            {
-                nodeASR.Text = "Preferred ASR: NONE";
-                nodeASR.ForeColor = Color.Red;
-            }
-            else
-            {
-                nodeASR.Text = "Preferred ASR: " + inASR;
-                nodeASR.ForeColor = Color.Black; ;
-            }
-
-            return nodeASR;
-        }
-
-        private Color colorUnit(classUnit inUnit)
-        {
-            if (inUnit.Assigned == false) return Color.Red;
-
-            return Color.Black;
-        }
-
-        private TreeNode nodeIOSUnitsGE(classIOS inDevice)
-        {
-            TreeNode nodeUnitsGE = new TreeNode("GE:");
-
-            foreach (classUnit U in inDevice.Units)
-            {
-                if (U.Type2 == UnitType.GE)
-                {
-                    TreeNode ge = new TreeNode(U.Prefix);
-                    ge.Checked = U.Assignable;
-                    ge.ForeColor = colorUnit(U);
-                    nodeUnitsGE.Nodes.Add(ge);
-                }
-            }
-
-            //nodeUnitsGE.Tag = nodeUnitsGE.IsExpanded;
-
-            return nodeUnitsGE;
-        }
-
-        private TreeNode nodeIOSUnitsCL(classIOS inDevice)
-        {
-            TreeNode nodeUnitsCL = new TreeNode("MON:");
-
-            foreach (classUnit U in inDevice.Units)
-            {
-                if (U.Type2 == UnitType.CL)
-                {
-                    TreeNode cl = new TreeNode(U.Prefix);
-                    cl.Checked = U.Assignable;
-                    cl.ForeColor = colorUnit(U);
-                    nodeUnitsCL.Nodes.Add(cl);
-                }
-            }
-
-            //nodeUnitsCL.Tag = nodeUnitsCL.IsExpanded;
-
-            return nodeUnitsCL;
-        }
-
-        private TreeNode nodeIOSUnitsCH(classIOS inDevice)
-        {
-            TreeNode nodeUnitsCH = new TreeNode("DCS:");
-
-            foreach (classUnit U in inDevice.Units)
-            {
-                if (U.Type2 == UnitType.CH)
-                {
-                    TreeNode ch = new TreeNode(U.Prefix);
-                    ch.Checked = U.Assignable;
-                    ch.ForeColor = colorUnit(U);
-                    nodeUnitsCH.Nodes.Add(ch);
-                }
-            }
-
-            //nodeUnitsCH.Tag = nodeUnitsCH.IsExpanded;
-
-            return nodeUnitsCH;
-        }
-
         private void loadGrids()
         {
-            gridUnMaps.Rows.Clear();
-            gridMaps.Rows.Clear();
-            loadGridMapped();
-            loadGridUnmapped();
+            loadGridUnassigned();
+            loadGridAssigned();
         }
 
-        private void loadGridUnmapped()
+        private void loadGridAssigned()
         {
             int row;
 
-            foreach (classIOS L in dbSite.Legacy)
+            gridAssigned.Rows.Clear();
+            foreach (KeyValuePair<string, classUnit> U in dbSite.WB.Units)
             {
-                foreach (classUnit U in L.Units)
+                if (U.Value.Assigned == true)
                 {
-                    if (U.Assigned == false)
+                    if (dbSite.Maps.ContainsKey(U.Key) == true)
                     {
-                        row = gridUnMaps.Rows.Add();
-                        gridUnMaps.Rows[row].Cells[0].Value = getCircuitType(U.Type2);
-                        gridUnMaps.Rows[row].Cells[1].Value = L.Hostname.ToUpper();
-                        gridUnMaps.Rows[row].Cells[2].Value = U.Prefix;
+                        classMap M = dbSite.Maps[U.Key];
+
+                        row = gridAssigned.Rows.Add();
+                        gridAssigned.Rows[row].Cells[0].Value = M.Type;
+                        gridAssigned.Rows[row].Cells[1].Value = M.Legacy;
+                        gridAssigned.Rows[row].Cells[2].Value = M.PrefixLegacy.ToUpper();
+                        gridAssigned.Rows[row].Cells[3].Value = M.ASR;
+                        gridAssigned.Rows[row].Cells[4].Value = M.PrefixASR;
                     }
                 }
             }
-            tabUnassigned.Text = "Unassigned (" + gridUnMaps.Rows.Count.ToString() + ")";
+            tabAssignedCX.Text = "Assigned: " + gridAssigned.Rows.Count.ToString().Trim();
         }
 
-        private void loadGridMapped()
+        private void loadGridUnassigned()
         {
             int row;
 
-            foreach (classMap M in dbSite.Maps)
+            gridUnassigned.Rows.Clear();
+            foreach (KeyValuePair<string, classUnit> kvpU in dbSite.WB.Units)
             {
-                row = gridMaps.Rows.Add();
-                gridMaps.Rows[row].Cells[0].Value = getCircuitType(M.Type2);
-                gridMaps.Rows[row].Cells[1].Value = M.Legacy.ToUpper();
-                gridMaps.Rows[row].Cells[2].Value = M.PrefixLegacy;
-                gridMaps.Rows[row].Cells[3].Value = M.ASR.ToUpper();
-                gridMaps.Rows[row].Cells[4].Value = M.PrefixASR;
+                if (kvpU.Value.Assigned == false)
+                {
+                    row = gridUnassigned.Rows.Add();
+                    gridUnassigned.Rows[row].Cells[0].Value = kvpU.Value.Type;
+                    gridUnassigned.Rows[row].Cells[1].Value = kvpU.Key.Split("*".ToCharArray())[0];
+                    gridUnassigned.Rows[row].Cells[2].Value = kvpU.Key.Split("*".ToCharArray())[1];
+                }
             }
-            tabAssigned.Text = "Assigned (" + gridMaps.Rows.Count.ToString() + ")";
+            tabUnassignedCX.Text = "Unassigned: " + gridUnassigned.Rows.Count.ToString().Trim();
         }
 
-        private string getCircuitType(string inUnitType)
+        private string parseNodePath(string inPath)
         {
-            switch (inUnitType)
-            {
-                case "STS-CH":
-                    return "DCS";
-                case "STS-CL":
-                    return "MON";
-                default:
-                    return "PHY";
-            }
-        }
+            string[] delim = new string[] { "\\" };
+            string[] pathArray = inPath.Split(delim, StringSplitOptions.None);
 
-        private string getCircuitType(UnitType inUnitType)
-        {
-            switch (inUnitType)
-            {
-                case UnitType.CH:
-                    return "DCS";
-                case UnitType.CL:
-                    return "MON";
-                default:
-                    return "PHY";
-            }
+            return pathArray.First() + "*" + pathArray.Last();
         }
-
     }
 }

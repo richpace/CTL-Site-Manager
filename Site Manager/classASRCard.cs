@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Site_Manager
 {
-    class classIOXCard
+    public class classASRCard
     {
         // FIELDS //
         private string cardPID = null;
         private int cardSlot = -1;
-        private classIOXPA[] cardPAs;
+        private classASRPA[] cardPAs;
 
         // CONSTRUCTORS //
-        public classIOXCard(string inPID, int inSlot)
+        public classASRCard(string inPID, int inSlot)
         {
             cardPID = inPID;
             cardSlot = inSlot;
@@ -23,7 +23,7 @@ namespace Site_Manager
         }
 
         // PROPERTIES //
-        public classIOXPA[] PA
+        public classASRPA[] PA
         {
             get
             {
@@ -31,10 +31,15 @@ namespace Site_Manager
             }
         }
 
+        public string PID
+        {
+            get { return cardPID; }
+        }
+
         // METHODS //
         public void AddPA(string inPID, int inSlot)
         {
-            cardPAs[inSlot] = new classIOXPA(inPID, inSlot);
+            cardPAs[inSlot] = new classASRPA(inPID, inSlot);
         }
 
         // SUPPORT LOGIC //
@@ -43,10 +48,10 @@ namespace Site_Manager
             switch (cardPID)
             {
                 case "A9K-SIP-700":
-                    cardPAs = new classIOXPA[2];
+                    cardPAs = new classASRPA[2];
                     break;
                 case "A9K-MOD160-SE":
-                    cardPAs = new classIOXPA[2];
+                    cardPAs = new classASRPA[2];
                     break;
             }
         }

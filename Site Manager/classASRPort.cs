@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Site_Manager
 {
-    public class classIOXPort
+    public class classASRPort
     {
         // FIELDS //
         private int portSlot = -1;
         private string portType;
-        private classIOXUnit[] portUnits;
+        private classASRUnit[] portUnits;
 
         // CONSTRUCTORS //
-        public classIOXPort(int inPort, string inType)
+        public classASRPort(int inPort, string inType)
         {
             portSlot = inPort;
             portType = inType;
@@ -23,7 +23,7 @@ namespace Site_Manager
         }
 
         // PROPERTIES //
-        public classIOXUnit[] Unit
+        public classASRUnit[] Unit
         {
             get
             {
@@ -37,27 +37,27 @@ namespace Site_Manager
             switch (portType)
             {
                 case "GE":
-                    portUnits = new classIOXUnit[1];
+                    portUnits = new classASRUnit[1];
                     for (int i = 0; i < 1; i++)
                     {
                         //portUnits[i] = new classIOXUnit(i, "GE");
-                        portUnits[i] = new classIOXUnit(i, UnitType.GE);
+                        portUnits[i] = new classASRUnit(i, UnitType.GE);
                     }
                     break;
                 case "CHOC12":
-                    portUnits = new classIOXUnit[12];
+                    portUnits = new classASRUnit[12];
                     for (int i = 0; i < 12; i++)
                     {
                         //portUnits[i] = new classIOXUnit(i, "STS-CH");
-                        portUnits[i] = new classIOXUnit(i, UnitType.CH);
+                        portUnits[i] = new classASRUnit(i, UnitType.DCS);
                     }
                     break;
                 case "CHOC48":
-                    portUnits = new classIOXUnit[48];
+                    portUnits = new classASRUnit[48];
                     for (int i = 0; i < 48; i++)
                     {
                         //portUnits[i] = new classIOXUnit(i, "STS-CL");
-                        portUnits[i] = new classIOXUnit(i, UnitType.CL);
+                        portUnits[i] = new classASRUnit(i, UnitType.MON);
                     }
                     break;
             }

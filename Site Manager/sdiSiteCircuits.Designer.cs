@@ -39,7 +39,6 @@
             this.cbDisplayScheduled = new System.Windows.Forms.CheckBox();
             this.btnAssign = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
-            this.btnExcel = new System.Windows.Forms.Button();
             this.cbDIV = new System.Windows.Forms.CheckBox();
             this.cbDense = new System.Windows.Forms.CheckBox();
             this.cbOther = new System.Windows.Forms.CheckBox();
@@ -171,16 +170,6 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // btnExcel
-            // 
-            this.btnExcel.Location = new System.Drawing.Point(730, 394);
-            this.btnExcel.Name = "btnExcel";
-            this.btnExcel.Size = new System.Drawing.Size(227, 23);
-            this.btnExcel.TabIndex = 7;
-            this.btnExcel.Text = "Export to Excel";
-            this.btnExcel.UseVisualStyleBackColor = true;
-            this.btnExcel.Click += new System.EventHandler(this.btnExcel_Click);
-            // 
             // cbDIV
             // 
             this.cbDIV.AutoSize = true;
@@ -266,7 +255,6 @@
             this.ClientSize = new System.Drawing.Size(984, 462);
             this.Controls.Add(this.textboxSearch);
             this.Controls.Add(this.gbDisplay);
-            this.Controls.Add(this.btnExcel);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnAssign);
             this.Controls.Add(this.calendarCircuits);
@@ -301,7 +289,6 @@
         private System.Windows.Forms.CheckBox cbDisplayScheduled;
         private System.Windows.Forms.Button btnAssign;
         private System.Windows.Forms.Button btnClose;
-        private System.Windows.Forms.Button btnExcel;
         private System.Windows.Forms.CheckBox cbDIV;
         private System.Windows.Forms.CheckBox cbDense;
         private System.Windows.Forms.CheckBox cbOther;
