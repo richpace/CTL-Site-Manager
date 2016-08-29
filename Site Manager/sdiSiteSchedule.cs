@@ -233,8 +233,8 @@ namespace Site_Manager
             wsDCS.Cells[2, 8].Value = "ASR Interface";
             wsDCS.Cells[2, 9].Value = "ASR DCS Port";
             wsDCS.Cells[2, 10].Value = "Engineering Order ID";
-            wsDCS.Cells[2, 11].Value = "CAC";
-            wsDCS.Cells[2, 12].Value = "T3 ID";
+            wsDCS.Cells[2, 12].Value = "CAC";
+            wsDCS.Cells[2, 11].Value = "T3 ID";
             wsDCS.Rows[2].Font.Bold = true;
 
             foreach (TreeNode N in inNode.Nodes)
